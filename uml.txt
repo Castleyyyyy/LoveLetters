@@ -52,6 +52,7 @@ PlayerBase --* Queue : players : Queue<Player>
 
 class Player {
   isProtected: boolean
+  isInGame: boolean
 }
 Player --* List : cards : List<Card>
 Player --* Connection : connection
