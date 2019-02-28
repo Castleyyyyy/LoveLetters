@@ -1,0 +1,94 @@
+@startuml
+
+class Connection {
+  username : String
+  ip : String
+}
+
+class List<ContentType>
+class Queue<ContentType>
+class Stack<ContentType>
+
+class GameServer {
+}
+
+GameServer --* List : connections : List<Connection>
+
+GameServer --* Game : game
+
+enum GamePhase {
+  STARTING,
+  PENDING,
+  FINISHED
+}
+
+class Game {
+  Game(connections: List<Connection>, onPlayerJoined: (player: Player) -> void, onGameFinished: () -> void, onGameStarted: () -> void, onCardPlayed: (card: Card, target?: Player) -> void, ... (alle Events aus Spalte 3 und 4))
+  nextRound(): void
+  joinGame(player: Player): void throws GameIsPendingException, GameIsPackedException
+  startGame(player: Player): void throws GameIsPendingException, NotEnoughPlayersException
+  playCard(player: Player, card: Card, selectedUser?: Player, cardGuess?: Card): Card | null throws CardNameIllegalException, NotYourTurnException, IllegalGuessException, MustPlayCountessException
+  getProtectedPlayers(): List<Player>
+  help(card: Card): String
+  rank() throws NotInGameException
+  ... alle Client@Server-Befehle()
+}
+
+class GameIsPendingException
+class GameIsPackedException
+class NotEnoughPlayersException
+class JedeAndereException
+
+Game --* GamePhase : phase
+Game --* PlayerBase : playerbase
+Game --* Stack : cardStack
+
+class PlayerBase {
+  getCurrentPlayer(): Player
+  rotate(): void
+}
+
+PlayerBase --* Queue : players : Queue<Player>
+
+class Player {
+  isProtected: boolean
+}
+Player --* List : cards : List<Card>
+Player --* Connection : connection
+
+interface Effect {
+  causeEffect(game: Game, selectedUser?: Player, cardGuess?: Card): void
+}
+
+abstract class Card {
+  getName(): String
+  getHelp(): String
+}
+
+Card --* Effect : effect
+
+class Prinzessin
+Prinzessin --|> Card
+
+class Gräfin
+Gräfin --|> Card
+
+class König
+König --|> Card
+
+class Prinz
+Prinz --|> Card
+
+class Zofe
+Zofe --|> Card
+
+class Baron
+Baron --|> Card
+
+class Priester
+Priester --|> Card
+
+class Wächterin
+Wächterin --|> Card
+
+@enduml

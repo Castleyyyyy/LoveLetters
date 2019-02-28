@@ -19,4 +19,5 @@ public class GameServer extends Server {
   void processClosedConnection(String pClientIP, int pClientPort) {
 
   }
+
 } // end of class GameServer
