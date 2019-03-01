@@ -25,7 +25,6 @@ public class GameServer extends Server {
 
   @Override
   void processNewConnection(String pClientIP, int pClientPort) {
-
   }
 
   @Override
