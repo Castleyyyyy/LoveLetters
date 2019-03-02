@@ -2,6 +2,7 @@ public class Player {
 
   private boolean isProtected;
   private boolean isInGame;
+  private int hearts;
 
   private String username;
   private String ip;
@@ -21,6 +22,18 @@ public class Player {
   public void setInGame(boolean inGame) {
     isInGame = inGame;
   }
+  
+  public int getHearts(){
+    return this.hearts;
+  } 
+  
+  public void addHeart(){
+    this.hearts++;
+  }
+  
+  public void resetHearts(){
+    this.hearts = 0;
+  }  
 
   public String getUsername() {
     return username;

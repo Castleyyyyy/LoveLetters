@@ -102,9 +102,16 @@ public class Game {
   void nextPlayer(){
     if (playerBase.rotate()) {
       return;
-    } else {
-      this.onRoundFinished.run();
-      nextRound();
+    } else {                                                                    // if round finished
+      this.playerBase.getCurrentPlayer().addHeart();
+      this.onRoundFinished.run();                                               
+      
+      if (this.playerBase.getCurrentPlayer().getHearts() == this.playerBase.getRequiredHearts()) {        // if game finished
+        this.onGameFinished.run();
+        this.phase = GamePhase.FINISHED;                                        // anything missing here??
+      } else {
+        nextRound();                                                            // continue with next round if game not finished
+      } // end of if-else
     } // end of if-else
   } // end of nextPlayer
   

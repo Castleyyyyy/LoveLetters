@@ -36,6 +36,16 @@ public class PlayerBase {
       return true;
     } // end of if-else
   }
+  
+  int getRequiredHearts(){
+    if (this.getNumberOfPlayers() == 4) {
+      return 3;
+    } else if (this.getNumberOfPlayers() == 3) {
+      return 4;
+    } else {
+      return 5;
+    } // end of if-else
+  } 
 
   boolean hasPlayer(Player p) {
     return QueueUtils.includes(this.players, p);
