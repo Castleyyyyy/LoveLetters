@@ -6,12 +6,35 @@ public class PlayerBase {
   private Queue<Player> players = new Queue<>();
 
   Player getCurrentPlayer() {
-    return null;
+    return this.players.front();
   }
 
-  void rotate() {
-    this.players.enqueue(this.players.front());
+  boolean rotate() {
+    int outCounter = 0;                                                         // determine number of players out of game
+    for (int i = 0; i < this.getNumberOfPlayers(); i++) {
+      if (!this.getCurrentPlayer().isInGame()) {
+        outCounter++;
+      } // end of if
+      
+      this.players.enqueue(this.players.front());
+      this.players.dequeue();
+    } // end of for
+    
+    this.players.enqueue(this.players.front());                                 // reset queue to previous state
     this.players.dequeue();
+    
+    for (int i = 0; i < this.getNumberOfPlayers(); i++) {                       // get next inGame player to front (!!unsure if this works at all times - what if no player inGame!!)
+      if (!this.getCurrentPlayer().isInGame()) {
+        this.players.enqueue(this.players.front());
+        this.players.dequeue();
+      } // end of if
+    } // end of for
+    
+    if (outCounter == this.getNumberOfPlayers()) {                              // if round is over (only one player left) return false BUT: what if no player inGame (see above)
+      return false;
+    } else {
+      return true;
+    } // end of if-else
   }
 
   boolean hasPlayer(Player p) {

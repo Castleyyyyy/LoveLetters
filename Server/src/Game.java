@@ -11,12 +11,14 @@ public class Game {
   private Runnable onGameFinished;
   private Runnable onGameStarted;
   private Consumer<Card> onCardPlayed;
+  private Runnable onRoundFinished;
 
-  public Game(Consumer<Player> onPlayerJoined, Runnable onGameFinished, Runnable onGameStarted, Consumer<Card> onCardPlayed) {
+  public Game(Consumer<Player> onPlayerJoined, Runnable onGameFinished, Runnable onGameStarted, Consumer<Card> onCardPlayed, Runnable onRoundFinished) {
     this.onPlayerJoined = onPlayerJoined;
     this.onGameFinished = onGameFinished;
     this.onGameStarted = onGameStarted;
     this.onCardPlayed = onCardPlayed;
+    this.onRoundFinished = onRoundFinished;
   }
 
   List<Player> getProtectedPlayers() {
@@ -43,7 +45,7 @@ public class Game {
     this.phase = GamePhase.PENDING;
     this.onGameStarted.run();
 
-    // TODO: invoke first round
+    this.nextRound();                                                           // invoke first round
   } // end of startGame
   
   void resetCardStack(){                                                        // put all 16 cards on cardStack (ordered)
@@ -96,6 +98,23 @@ public class Game {
       } // end of while
     } // end of for
   } // end of shuffle
+  
+  void nextPlayer(){
+    if (playerBase.rotate()) {
+      return;
+    } else {
+      this.onRoundFinished.run();
+      nextRound();
+    } // end of if-else
+  } // end of nextPlayer
+  
+  void nextRound(){
+    this.resetCardStack();                                                      // reset cardStack and shuffle twice - better safe than sorry
+    this.shuffle();
+    this.shuffle();
+    
+    // TODO distribute cards (each player one card)
+  } // end of nextRound
 
   void joinGame(Player player) throws GameIsPendingException, PlayerBase.DuplicatePlayerException , GameIsPackedException{
     if (this.phase == GamePhase.PENDING) {
