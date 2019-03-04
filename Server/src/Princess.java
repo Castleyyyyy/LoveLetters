@@ -1,18 +1,32 @@
 public class Princess extends Card {
 
-  @Override
-  String getName() {
-    return null;
-  }
+    private int number = 8;
 
-  @Override
-  String getHelp() {
-    return null;
-  }
+    @Override
+    int getNumber() {
+        return this.number;
+    }
 
-  @Override
-  public void causeEffect(Game game, Player selectedUser, Card cardGuess) {
+    @Override
+    String getName() {
+        return "Princess";
+    }
 
-  }
+    @Override
+    String getHelp() {
+        return "If you discard the Princess — no matter how or why — she has tossed your letter into the fire. You are immediately knocked out of the round.";
+    }
+
+    /**
+     * causeEffect eliminates the player who played the card.
+     *
+     * @param game         The current game object.
+     * @param selectedUser The player who played the card.
+     * @param cardGuess    Null.
+     */
+    @Override
+    public void causeEffect(Game game, Player selectedUser, Card cardGuess) {
+        game.eliminatePlayer(selectedUser);
+    }
 
 }

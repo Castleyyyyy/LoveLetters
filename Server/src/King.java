@@ -1,18 +1,31 @@
 public class King extends Card {
+    private int number = 6;
 
-  @Override
-  String getName() {
-    return null;
-  }
+    @Override
+    int getNumber() {
+        return this.number;
+    }
 
-  @Override
-  String getHelp() {
-    return null;
-  }
+    @Override
+    String getName() {
+        return "King";
+    }
 
-  @Override
-  public void causeEffect(Game game, Player selectedUser, Card cardGuess) {
+    @Override
+    String getHelp() {
+        return "When you discard the King, trade the card in your hand with the card held by another player of your choice. You cannot trade with a player who is out of the round.";
+    }
 
-  }
+    /**
+     * causeEffect switches the card of the current player with another player.
+     *
+     * @param game         Current game instance
+     * @param selectedUser The player whose card will be switched.
+     * @param cardGuess    The card from the own stack which will be switched.
+     */
+    @Override
+    public void causeEffect(Game game, Player selectedUser, Card cardGuess) {
+        game.switchCards(selectedUser, cardGuess);
+    }
 
 }

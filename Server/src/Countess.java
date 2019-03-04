@@ -1,18 +1,30 @@
 public class Countess extends Card {
+    private int number = 7;
 
-  @Override
-  String getName() {
-    return null;
-  }
+    @Override
+    int getNumber() {
+        return this.number;
+    }
 
-  @Override
-  String getHelp() {
-    return null;
-  }
+    @Override
+    String getName() {
+        return "Countess";
+    }
 
-  @Override
-  public void causeEffect(Game game, Player selectedUser, Card cardGuess) {
+    @Override
+    String getHelp() {
+        return "If you ever have the Countess and either the King or Prince in your hand, you must discard the Countess. You do not have to reveal the other card in your hand. Of course, you can also discard the Countess even if you do not have a royal family member in your hand.";
+    }
 
-  }
+    /**
+     * Because the card itself does not have any effect, this method is irrelevant.
+     * @param game Irrelevant
+     * @param selectedUser Irrelevant
+     * @param cardGuess Irrelevant
+     */
+    @Override
+    public void causeEffect(Game game, Player selectedUser, Card cardGuess) {
+        return;
+    }
 
 }

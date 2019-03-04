@@ -1,18 +1,24 @@
 public class Baron extends Card {
+    private int number = 3;
 
-  @Override
-  String getName() {
-    return null;
-  }
+    @Override
+    int getNumber() {
+        return this.number;
+    }
 
-  @Override
-  String getHelp() {
-    return null;
-  }
+    @Override
+    String getName() {
+        return "Baron";
+    }
 
-  @Override
-  public void causeEffect(Game game, Player selectedUser, Card cardGuess) {
+    @Override
+    String getHelp() {
+        return "When you discard the Baron, choose another player still in the round. You and that player secretly compare your hands. The player with the lower number is knocked out of the round. In case of a tie, nothing happens.";
+    }
 
-  }
+    @Override
+    public void causeEffect(Game game, Player selectedUser, Card cardGuess) {
+        game.compareCards(selectedUser);
+    }
 
 }

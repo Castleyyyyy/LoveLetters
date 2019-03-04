@@ -1,18 +1,24 @@
 public class Priest extends Card {
+    private int number = 2;
 
-  @Override
-  String getName() {
-    return null;
-  }
+    @Override
+    int getNumber() {
+        return this.number;
+    }
 
-  @Override
-  String getHelp() {
-    return null;
-  }
+    @Override
+    String getName() {
+        return "Priest";
+    }
 
-  @Override
-  public void causeEffect(Game game, Player selectedUser, Card cardGuess) {
+    @Override
+    String getHelp() {
+        return "When you discard the Priest, you can look at another player’s hand.";
+    }
 
-  }
+    @Override
+    public void causeEffect(Game game, Player selectedUser, Card cardGuess) {
+        game.revealCardToCurrentPlayer(selectedUser);
+    }
 
 }
