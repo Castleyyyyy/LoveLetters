@@ -21,11 +21,11 @@ public class King extends Card {
      *
      * @param game         Current game instance
      * @param selectedUser The player whose card will be switched.
-     * @param cardGuess    The card from the own stack which will be switched.
      */
     @Override
     public void causeEffect(Game game, Player selectedUser, Card cardGuess) {
-        game.switchCards(selectedUser, cardGuess);
+        game.removeCurrentCard(this.getName());
+        game.switchCards(selectedUser);
     }
 
 }

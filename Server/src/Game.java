@@ -12,13 +12,15 @@ public class Game {
     private Runnable onGameStarted;
     private Consumer<Card> onCardPlayed;
     private Runnable onRoundFinished;
+    private Consumer<Player> onPlayerEliminated;
 
-    public Game(Consumer<Player> onPlayerJoined, Runnable onGameFinished, Runnable onGameStarted, Consumer<Card> onCardPlayed, Runnable onRoundFinished) {
+    public Game(Consumer<Player> onPlayerJoined, Runnable onGameFinished, Runnable onGameStarted, Consumer<Card> onCardPlayed, Runnable onRoundFinished, Consumer<Player> onPlayerEliminated) {
         this.onPlayerJoined = onPlayerJoined;
         this.onGameFinished = onGameFinished;
         this.onGameStarted = onGameStarted;
         this.onCardPlayed = onCardPlayed;
         this.onRoundFinished = onRoundFinished;
+        this.onPlayerEliminated = onPlayerEliminated;
     }
 
     List<Player> getProtectedPlayers() {
@@ -132,7 +134,8 @@ public class Game {
      * @param player The player who got eliminated.
      */
     void eliminatePlayer(Player player) {
-        // TODO
+        player.setInGame(false);
+        this.onPlayerEliminated.accept(player);
     }
 
     /**
@@ -140,14 +143,25 @@ public class Game {
      * switchCards gives a card to the targetPlayer
      * while it takes the card from the targetPlayer and gives it to the current player.
      * The method also sends a message to all clients that cards were switched (but not which cards).
-     * It also has to send the information to the targePlayer that he now has a new card and to the current player,
+     * It also has to send the information to the targetPlayer that he now has a new card and to the current player,
      * which card he got.
      *
      * @param targetPlayer
-     * @param cardForSwitch
      */
-    void switchCards(Player targetPlayer, Card cardForSwitch) {
-        // TODO
+    void switchCards(Player targetPlayer) {
+        if (targetPlayer.isProtected()) {
+            // TODO:
+        }
+        List<Card> currentCards = this.playerBase.getCurrentPlayer().getCards();
+
+        List<Card> targetCards = targetPlayer.getCards();
+
+        this.playerBase.getCurrentPlayer().setCards(targetCards);
+        targetPlayer.setCards(currentCards);
+
+        // TODO: Message to all that cards were changed
+        // TODO: Message to both players which card they now have (?)
+
     }
 
     /**
@@ -157,7 +171,32 @@ public class Game {
      * @param targetPlayer The player whose card will be revealed.
      */
     void revealCardToAll(Player targetPlayer) {
+        if (targetPlayer.isProtected()) {
+            // TODO
+        }
 
+        List<Card> cards = targetPlayer.getCards();
+        cards.toFirst();
+        // TODO: Message to all Players
+
+        if (cards.getContent().getName().equals("Princess")) {
+            eliminatePlayer(targetPlayer);
+        }
+
+
+
+        Card newCard = this.cardStack.top();
+
+        if (newCard == null) {
+            // TODO: Message - cardStack is empty.
+        }
+
+        List<Card> newCards = new List<Card>();
+        newCards.append(newCard);
+
+        targetPlayer.setCards(newCards);
+
+        // TODO: Message to targetPlayer
     }
 
     /**
@@ -165,20 +204,27 @@ public class Game {
      * @param targetPlayer
      */
     void revealCardToCurrentPlayer(Player targetPlayer) {
+        if (targetPlayer.isProtected()) {
+            // TODO: 
+        }
 
+        List<Card> cards = targetPlayer.getCards();
+        cards.toFirst();
+
+        // TODO: Message to all clients that the card was shown to the current player.
+        // TODO: Message to current player which card the targetPlayer got.
     }
 
     /**
-     * protectPlayer sets the protected attribute of current player to true.
+     * protectCurrentPlayer sets the protected attribute of current player to true.
      */
-    void protectPlayer() {
+    void protectCurrentPlayer() {
 
         Player current = this.playerBase.getCurrentPlayer();
-        if (current == null) return;
 
         current.setProtected(true);
+        // TODO: send message
     }
-
     /**
      * compareCards takes the number from the card of the current player and the number from the card of the targetPlayer and compares them.
      * The player with the lower number gets eliminated. If both have the same number, nothing happens.
@@ -188,6 +234,26 @@ public class Game {
      * @param targetPlayer The player whose card will be compared.
      */
     void compareCards(Player targetPlayer) {
+
+        if (targetPlayer.isProtected()) {
+            // TODO
+        }
+
+        List<Card> targetCard = targetPlayer.getCards();
+        List<Card> currentCard = this.playerBase.getCurrentPlayer().getCards();
+
+        currentCard.toFirst();
+        targetCard.toFirst();
+
+        // both players should only have one card
+        int numberCurrent = currentCard.getContent().getNumber();
+        int numberTarget = targetCard.getContent().getNumber();
+
+        if (numberCurrent > numberTarget) {
+            eliminatePlayer(targetPlayer);
+        }else if (numberCurrent < numberTarget) {
+            eliminatePlayer(this.playerBase.getCurrentPlayer());
+        }
     }
 
     /**
@@ -195,10 +261,30 @@ public class Game {
      * However he cannot guess the card "guard".
      * If his guess is correct, the targetPlayer gets eliminated.
      * @param targetPlayer
-     * @param guess
+     * @param guess Name of the guessed card.
      */
-    void guessCard(Player targetPlayer, Card guess) {
+    void guessCard(Player targetPlayer, String guess) {
+        if (targetPlayer.isProtected()); // TODO:
+        if (guess.equals("Guard")); // TODO:
 
+        List<Card> cards = targetPlayer.getCards();
+
+        cards.toFirst();
+        if (cards.getContent().getName().equals(guess)) {
+            // TODO: Send message what was guessed.
+            eliminatePlayer(targetPlayer);
+        }else {
+            // TODO: Send message to all what was guessed and that it is wrong.
+        }
+
+    }
+
+    /**
+     * removeCurrentCard removes the card which has been played, so it can not be reused.
+     * @param cardname The name of the card which has been played.
+     */
+    void removeCurrentCard(String cardname) {
+        this.playerBase.getCurrentPlayer().removeCardFromHand(cardname);
     }
 
     void joinGame(Player player) throws GameIsPendingException, PlayerBase.DuplicatePlayerException, GameIsPackedException {

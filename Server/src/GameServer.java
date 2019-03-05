@@ -10,7 +10,9 @@ public class GameServer extends Server {
       this::onPlayerJoined,
       () -> {},
       () -> {},
-      this::onCardPlayed
+      this::onCardPlayed,
+        ()->{},
+            this::onPlayerEliminated
     );
   }
 
@@ -22,6 +24,9 @@ public class GameServer extends Server {
     System.out.println("Card was played");
   }
 
+  void onPlayerEliminated(Player player){
+    System.out.println("Player "+ player.getUsername() + " has been eliminated.");
+  }
 
   @Override
   void processNewConnection(String pClientIP, int pClientPort) {

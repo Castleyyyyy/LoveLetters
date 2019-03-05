@@ -24,6 +24,7 @@ public class Countess extends Card {
      */
     @Override
     public void causeEffect(Game game, Player selectedUser, Card cardGuess) {
+        game.removeCurrentCard(this.getName());
         return;
     }
 

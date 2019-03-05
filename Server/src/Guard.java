@@ -18,7 +18,8 @@ public class Guard extends Card {
 
   @Override
   public void causeEffect(Game game, Player selectedUser, Card cardGuess) {
-    game.guessCard(selectedUser, cardGuess);
+    game.removeCurrentCard(this.getName());
+    game.guessCard(selectedUser, cardGuess.getName());
   }
 
 }

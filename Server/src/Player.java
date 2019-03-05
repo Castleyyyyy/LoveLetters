@@ -7,6 +7,8 @@ public class Player {
   private String username;
   private String ip;
 
+  private List<Card> cards;
+
   public boolean isProtected() {
     return isProtected;
   }
@@ -49,5 +51,23 @@ public class Player {
 
   public void setIp(String ip) {
     this.ip = ip;
+  }
+
+  public List<Card> getCards() {
+    return this.cards;
+  }
+  void removeCardFromHand(String cardname) {
+    List<Card> cards = this.getCards();
+
+    for (cards.toFirst(); cards.hasAccess(); cards.next()) {
+      if (cards.getContent().getName().equals(cardname)) {
+        cards.remove();
+        return;
+      }
+    }
+  }
+
+  public void setCards(List<Card> cards) {
+    this.cards = cards;
   }
 }

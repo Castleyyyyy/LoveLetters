@@ -18,7 +18,8 @@ public class Maid extends Card {
 
   @Override
   public void causeEffect(Game game, Player selectedUser, Card cardGuess) {
-    game.protectPlayer();
+    game.removeCurrentCard(this.getName());
+    game.protectCurrentPlayer();
   }
 
 }
