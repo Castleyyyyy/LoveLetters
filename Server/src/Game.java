@@ -20,9 +20,10 @@ public class Game {
     private Consumer<Player> onPlayerEliminated;
     private Consumer<Pair<Player, Player>> onCardsSwapped;
     private Consumer<Pair<Player, List<Card>>> onReceivesNewCards;
-    private Consumer<Pair<Player, Card>> onPlayersCardRevealed;
+    private Consumer<Pair<Player, Card>> onCardRevealedToAll;
+    private Consumer<CardRevealedToSinglePlayerPayload> onCardRevealedToSinglePlayer;
 
-    public Game(Consumer<Player> onPlayerJoined, Runnable onGameFinished, Runnable onGameStarted, Consumer<Card> onCardPlayed, Runnable onRoundFinished, Consumer<Player> onPlayerEliminated, Consumer<Pair<Player, Player>> onCardsSwapped, Consumer<Pair<Player, List<Card>>> onReceivesNewCards, Consumer<Pair<Player, Card>> onPlayersCardRevealed) {
+    public Game(Consumer<Player> onPlayerJoined, Runnable onGameFinished, Runnable onGameStarted, Consumer<Card> onCardPlayed, Runnable onRoundFinished, Consumer<Player> onPlayerEliminated, Consumer<Pair<Player, Player>> onCardsSwapped, Consumer<Pair<Player, List<Card>>> onReceivesNewCards, Consumer<Pair<Player, Card>> onPlayersCardRevealed, Consumer<CardRevealedToSinglePlayerPayload> onCardRevealedToSinglePlayer) {
         this.onPlayerJoined = onPlayerJoined;
         this.onGameFinished = onGameFinished;
         this.onGameStarted = onGameStarted;
@@ -31,7 +32,8 @@ public class Game {
         this.onPlayerEliminated = onPlayerEliminated;
         this.onCardsSwapped = onCardsSwapped;
         this.onReceivesNewCards = onReceivesNewCards;
-        this.onPlayersCardRevealed = onPlayersCardRevealed;
+        this.onCardRevealedToAll = onPlayersCardRevealed;
+        this.onCardRevealedToSinglePlayer = onCardRevealedToSinglePlayer;
 
         this.db = new Database("127.0.0.1", 3306, "abimotto", "root", "");
     }
@@ -203,7 +205,7 @@ public class Game {
         List<Card> cards = targetPlayer.getCards();
         cards.toFirst();
         Card firstCard = cards.getContent();
-        this.onPlayersCardRevealed.accept(new Pair<>(targetPlayer, firstCard));
+        this.onCardRevealedToAll.accept(new Pair<>(targetPlayer, firstCard));
 
         if (firstCard.hasName(Princess.NAME)) {
             eliminatePlayer(targetPlayer);
@@ -234,11 +236,13 @@ public class Game {
             // TODO:
         }
 
+        Player currentPlayer = playerBase.getCurrentPlayer();
+
         List<Card> cards = targetPlayer.getCards();
         cards.toFirst();
+        Card firstCard = cards.getContent();
 
-        // TODO: Message to all clients that the card was shown to the current player.
-        // TODO: Message to current player which card the targetPlayer got.
+        this.onCardRevealedToSinglePlayer.accept(new CardRevealedToSinglePlayerPayload(targetPlayer, currentPlayer, firstCard));
     }
 
     /**
