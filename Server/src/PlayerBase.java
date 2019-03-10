@@ -87,6 +87,14 @@ public class PlayerBase {
     players.enqueue(p);
   }
 
+  /**
+   * getCopyOfPlayers returns a copy of the queue with all the players.
+   * @return The copy of the queue.
+   */
+  Queue<Player> getCopyOfPlayers() {
+    return QueueUtils.copy(this.players);
+  }
+
   static class DuplicatePlayerException extends Exception {}
 
 }

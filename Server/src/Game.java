@@ -7,6 +7,9 @@ public class Game {
     private GamePhase phase = GamePhase.STARTING;
     private PlayerBase playerBase = new PlayerBase();
 
+    private Database db;
+    private int roundCounter = 0;
+
     private Consumer<Player> onPlayerJoined;
     private Runnable onGameFinished;
     private Runnable onGameStarted;
@@ -21,6 +24,8 @@ public class Game {
         this.onCardPlayed = onCardPlayed;
         this.onRoundFinished = onRoundFinished;
         this.onPlayerEliminated = onPlayerEliminated;
+
+        this.db = new Database("127.0.0.1", 3306, "abimotto", "root", "");
     }
 
     List<Player> getProtectedPlayers() {
@@ -205,7 +210,7 @@ public class Game {
      */
     void revealCardToCurrentPlayer(Player targetPlayer) {
         if (targetPlayer.isProtected()) {
-            // TODO: 
+            // TODO:
         }
 
         List<Card> cards = targetPlayer.getCards();
@@ -305,9 +310,26 @@ public class Game {
             throw new NotInGameException();
         }
 
+        this.roundCounter++;
+        this.writeResultsToDB();
         this.phase = GamePhase.FINISHED;
         this.onGameFinished.run();
     } // end of endGame
+
+    /**
+     * writeResultsToDB writes every user to the database.
+     */
+    void writeResultsToDB() {
+        Queue<Player> q = this.playerBase.getCopyOfPlayers();
+
+        while(!q.isEmpty()) {
+            Player c = q.front();
+
+            db.writeUserIntoDb(c.getUsername(), c.getHearts(), this.roundCounter);
+
+            q.dequeue();
+        }
+    }
 
     static class GameIsPendingException extends Exception {
     }
