@@ -128,8 +128,19 @@ public class Game {
         this.shuffle();
         this.shuffle();
 
-        // TODO distribute cards (each player one card)
+        Queue<Player> players = this.playerBase.getCopyOfPlayers();
+        while (!players.isEmpty()) {
+            Player p = players.front();
+            players.dequeue();
+            p.giveCard(this.drawCard());
+        }
     } // end of nextRound
+
+    private Card drawCard() {
+        Card card = this.cardStack.top();
+        this.cardStack.pop();
+        return card;
+    }
 
     /**
      * eliminatePlayer sets the ingame-attribute for a specific player to false.

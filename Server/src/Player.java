@@ -56,6 +56,7 @@ public class Player {
   public List<Card> getCards() {
     return this.cards;
   }
+
   void removeCardFromHand(String cardname) {
     List<Card> cards = this.getCards();
 
@@ -65,6 +66,33 @@ public class Player {
         return;
       }
     }
+  }
+
+  public int getNumberOfCards() {
+    cards.toFirst();
+
+    int count = 0;
+    while (cards.hasAccess()) {
+      cards.next();
+      count++;
+    }
+
+    return count;
+  }
+
+  private boolean isNumberOfCardsValid() {
+    int numberOfCards = this.getNumberOfCards();
+
+    return numberOfCards > 0 && numberOfCards < 3;
+  }
+
+  public void giveCard(Card card) {
+    if (!this.isNumberOfCardsValid()) {
+      return;
+      //TODO: maybe throw error
+    }
+
+    this.cards.append(card);
   }
 
   public void setCards(List<Card> cards) {
