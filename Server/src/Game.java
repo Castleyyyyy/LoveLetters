@@ -20,8 +20,9 @@ public class Game {
     private Consumer<Player> onPlayerEliminated;
     private Consumer<Pair<Player, Player>> onCardsSwapped;
     private Consumer<Pair<Player, List<Card>>> onReceivesNewCards;
+    private Consumer<Player> onPlayersCardRevealed;
 
-    public Game(Consumer<Player> onPlayerJoined, Runnable onGameFinished, Runnable onGameStarted, Consumer<Card> onCardPlayed, Runnable onRoundFinished, Consumer<Player> onPlayerEliminated, Consumer<Pair<Player, Player>> onCardsSwapped, Consumer<Pair<Player, List<Card>>> onReceivesNewCards) {
+    public Game(Consumer<Player> onPlayerJoined, Runnable onGameFinished, Runnable onGameStarted, Consumer<Card> onCardPlayed, Runnable onRoundFinished, Consumer<Player> onPlayerEliminated, Consumer<Pair<Player, Player>> onCardsSwapped, Consumer<Pair<Player, List<Card>>> onReceivesNewCards, Consumer<Player> onPlayersCardRevealed) {
         this.onPlayerJoined = onPlayerJoined;
         this.onGameFinished = onGameFinished;
         this.onGameStarted = onGameStarted;
@@ -30,6 +31,7 @@ public class Game {
         this.onPlayerEliminated = onPlayerEliminated;
         this.onCardsSwapped = onCardsSwapped;
         this.onReceivesNewCards = onReceivesNewCards;
+        this.onPlayersCardRevealed = onPlayersCardRevealed;
 
         this.db = new Database("127.0.0.1", 3306, "abimotto", "root", "");
     }
@@ -200,9 +202,9 @@ public class Game {
 
         List<Card> cards = targetPlayer.getCards();
         cards.toFirst();
-        // TODO: Message to all Players
+        this.onPlayersCardRevealed.accept(targetPlayer);
 
-        if (cards.getContent().getName().equals("Princess")) {
+        if (cards.getContent().getName().equals(Princess.NAME)) {
             eliminatePlayer(targetPlayer);
         }
 
@@ -219,7 +221,7 @@ public class Game {
 
         targetPlayer.setCards(newCards);
 
-        // TODO: Message to targetPlayer
+        this.onReceivesNewCards.accept(new Pair<>(targetPlayer, newCards));
     }
 
     /**

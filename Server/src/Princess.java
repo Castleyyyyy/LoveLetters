@@ -1,5 +1,7 @@
 public class Princess extends Card {
 
+    static String NAME = "Princess";
+
     private int number = 8;
 
     @Override
@@ -9,7 +11,7 @@ public class Princess extends Card {
 
     @Override
     String getName() {
-        return "Princess";
+        return NAME;
     }
 
     @Override
