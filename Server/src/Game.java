@@ -20,9 +20,9 @@ public class Game {
     private Consumer<Player> onPlayerEliminated;
     private Consumer<Pair<Player, Player>> onCardsSwapped;
     private Consumer<Pair<Player, List<Card>>> onReceivesNewCards;
-    private Consumer<Player> onPlayersCardRevealed;
+    private Consumer<Pair<Player, Card>> onPlayersCardRevealed;
 
-    public Game(Consumer<Player> onPlayerJoined, Runnable onGameFinished, Runnable onGameStarted, Consumer<Card> onCardPlayed, Runnable onRoundFinished, Consumer<Player> onPlayerEliminated, Consumer<Pair<Player, Player>> onCardsSwapped, Consumer<Pair<Player, List<Card>>> onReceivesNewCards, Consumer<Player> onPlayersCardRevealed) {
+    public Game(Consumer<Player> onPlayerJoined, Runnable onGameFinished, Runnable onGameStarted, Consumer<Card> onCardPlayed, Runnable onRoundFinished, Consumer<Player> onPlayerEliminated, Consumer<Pair<Player, Player>> onCardsSwapped, Consumer<Pair<Player, List<Card>>> onReceivesNewCards, Consumer<Pair<Player, Card>> onPlayersCardRevealed) {
         this.onPlayerJoined = onPlayerJoined;
         this.onGameFinished = onGameFinished;
         this.onGameStarted = onGameStarted;
@@ -202,9 +202,10 @@ public class Game {
 
         List<Card> cards = targetPlayer.getCards();
         cards.toFirst();
-        this.onPlayersCardRevealed.accept(targetPlayer);
+        Card firstCard = cards.getContent();
+        this.onPlayersCardRevealed.accept(new Pair<>(targetPlayer, firstCard));
 
-        if (cards.getContent().getName().equals(Princess.NAME)) {
+        if (firstCard.hasName(Princess.NAME)) {
             eliminatePlayer(targetPlayer);
         }
 
