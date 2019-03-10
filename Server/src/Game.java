@@ -1,3 +1,5 @@
+import javafx.util.Pair;
+
 import java.util.function.Consumer;
 import java.util.Random;
 
@@ -16,14 +18,18 @@ public class Game {
     private Consumer<Card> onCardPlayed;
     private Runnable onRoundFinished;
     private Consumer<Player> onPlayerEliminated;
+    private Consumer<Pair<Player, Player>> onCardsSwapped;
+    private Consumer<Pair<Player, List<Card>>> onReceivesNewCards;
 
-    public Game(Consumer<Player> onPlayerJoined, Runnable onGameFinished, Runnable onGameStarted, Consumer<Card> onCardPlayed, Runnable onRoundFinished, Consumer<Player> onPlayerEliminated) {
+    public Game(Consumer<Player> onPlayerJoined, Runnable onGameFinished, Runnable onGameStarted, Consumer<Card> onCardPlayed, Runnable onRoundFinished, Consumer<Player> onPlayerEliminated, Consumer<Pair<Player, Player>> onCardsSwapped, Consumer<Pair<Player, List<Card>>> onReceivesNewCards) {
         this.onPlayerJoined = onPlayerJoined;
         this.onGameFinished = onGameFinished;
         this.onGameStarted = onGameStarted;
         this.onCardPlayed = onCardPlayed;
         this.onRoundFinished = onRoundFinished;
         this.onPlayerEliminated = onPlayerEliminated;
+        this.onCardsSwapped = onCardsSwapped;
+        this.onReceivesNewCards = onReceivesNewCards;
 
         this.db = new Database("127.0.0.1", 3306, "abimotto", "root", "");
     }
@@ -168,16 +174,17 @@ public class Game {
         if (targetPlayer.isProtected()) {
             // TODO:
         }
-        List<Card> currentCards = this.playerBase.getCurrentPlayer().getCards();
+        Player currentPlayer = this.playerBase.getCurrentPlayer();
+        List<Card> currentCards = currentPlayer.getCards();
 
         List<Card> targetCards = targetPlayer.getCards();
 
         this.playerBase.getCurrentPlayer().setCards(targetCards);
         targetPlayer.setCards(currentCards);
 
-        // TODO: Message to all that cards were changed
-        // TODO: Message to both players which card they now have (?)
-
+        this.onCardsSwapped.accept(new Pair<>(currentPlayer, targetPlayer));
+        this.onReceivesNewCards.accept(new Pair<>(currentPlayer, targetCards));
+        this.onReceivesNewCards.accept(new Pair<>(targetPlayer, currentCards));
     }
 
     /**
