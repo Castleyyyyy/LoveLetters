@@ -1,3 +1,4 @@
+
 @startuml
 
 class Connection {
@@ -25,14 +26,35 @@ enum GamePhase {
 class Game {
   Game(connections: List<Connection>, onPlayerJoined: (player: Player) -> void, onGameFinished: () -> void, onGameStarted: () -> void, onCardPlayed: (card: Card, target?: Player) -> void, ... (alle Events aus Spalte 3 und 4))
   nextRound(): void
+  nextPlayer(): void
   joinGame(player: Player): void throws GameIsPendingException, GameIsPackedException
   startGame(player: Player): void throws GameIsPendingException, NotEnoughPlayersException
   playCard(player: Player, card: Card, selectedUser?: Player, cardGuess?: Card): Card | null throws CardNameIllegalException, NotYourTurnException, IllegalGuessException, MustPlayCountessException
   getProtectedPlayers(): List<Player>
   help(card: Card): String
   rank() throws NotInGameException
+  eliminatePlayer(player: Player):void
+  switchCards(targetPlayer: Player, cardForSwitch: Card): void
+  revealCardToAll(targetPlayer: Player): void
+  protectPlayer(): void
+  compareCards(targetPlayer: Player): void
+  guessCard(targetPlayer: Player, gues: Card):void
+  removeCurrentCard(cardname: String)
+  writeResultsToDB(): void
   ... alle Client@Server-Befehle()
 }
+
+class Database {
+  Database(pIP: String, pPort: int, pDatabase: String, pUsername: String, pPassword: String)
+  writeUserIntoDBb(pUsername: String, pHearts int, pRound int): void
+}
+
+class DatabaseConnector {
+
+}
+
+Database --* DatabaseConnector : db : DatabaseConnector
+
 
 class GameIsPendingException
 class GameIsPackedException
@@ -42,18 +64,23 @@ class JedeAndereException
 Game --* GamePhase : phase
 Game --* PlayerBase : playerbase
 Game --* Stack : cardStack
+Game --* Database: db
 
 class PlayerBase {
   getCurrentPlayer(): Player
   rotate(): void
+  getCopyOfPlayers(): Queue<Player>
 }
 
 PlayerBase --* Queue : players : Queue<Player>
 
 class Player {
-  isProtected: boolean
+  isProtected: boolean 
   isInGame: boolean
+  getCards():List<Card>
+  setCards(List<Card> cards)
 }
+
 Player --* List : cards : List<Card>
 Player --* Connection : connection
 
@@ -62,6 +89,7 @@ interface Effect {
 }
 
 abstract class Card {
+  getNumber(): int
   getName(): String
   getHelp(): String
 }
@@ -93,3 +121,5 @@ class Wächterin
 Wächterin --|> Card
 
 @enduml
+
+
