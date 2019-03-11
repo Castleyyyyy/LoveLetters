@@ -150,7 +150,7 @@ public abstract class Server
         
         while (verbindungen.hasAccess())
         {
-            lSerververbindung = (ServerConnection) verbindungen.getObject();
+            lSerververbindung = (ServerConnection) verbindungen.getContent();
             if (lSerververbindung.getRemoteIP().equals(pClientIP) && lSerververbindung.getRemotePort() == pClientPort)
                 return lSerververbindung;
             verbindungen.next();
@@ -184,7 +184,7 @@ public abstract class Server
         verbindungen.toFirst();
         while (verbindungen.hasAccess())
         {
-            lSerververbindung = (ServerConnection) verbindungen.getObject();
+            lSerververbindung = (ServerConnection) verbindungen.getContent();
             lSerververbindung.send(pMessage);
             verbindungen.next();
         }   
@@ -219,7 +219,7 @@ public abstract class Server
         verbindungen.toFirst();
         while (verbindungen.hasAccess())
         {
-            ServerConnection lClient = (ServerConnection) verbindungen.getObject();
+            ServerConnection lClient = (ServerConnection) verbindungen.getContent();
             if (lClient == pVerbindung)
                 verbindungen.remove();
             verbindungen.next();
