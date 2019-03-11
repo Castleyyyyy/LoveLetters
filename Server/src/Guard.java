@@ -1,4 +1,7 @@
 public class Guard extends Card {
+
+  static String NAME = "GUARD";
+
   private int number = 1;
 
   @Override
@@ -8,7 +11,7 @@ public class Guard extends Card {
 
   @Override
   String getName() {
-    return "Guard";
+    return NAME;
   }
 
   @Override

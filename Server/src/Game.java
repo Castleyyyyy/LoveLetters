@@ -296,7 +296,7 @@ public class Game {
      */
     void guessCard(Player targetPlayer, String guess) {
         if (targetPlayer.isProtected()); // TODO:
-        if (guess.equals("Guard")); // TODO:
+        if (guess.equals(Guard.NAME)); // TODO:
 
         List<Card> cards = targetPlayer.getCards();
 
