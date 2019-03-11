@@ -1,16 +1,17 @@
 import javafx.util.Pair;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.Random;
 
 public class Game {
-    private Stack<Card> cardStack = new Stack<Card>();
+    private Stack<Card> cardStack = new Stack<>();
 
     private GamePhase phase = GamePhase.STARTING;
     private PlayerBase playerBase = new PlayerBase();
 
     private Database db;
-    private int roundCounter = 0;
+    private AtomicInteger roundCounter = new AtomicInteger(0);
 
     private Consumer<Player> onPlayerJoined;
     private Runnable onGameFinished;
@@ -335,7 +336,7 @@ public class Game {
             throw new NotInGameException();
         }
 
-        this.roundCounter++;
+        this.roundCounter.incrementAndGet();
         this.writeResultsToDB();
         this.phase = GamePhase.FINISHED;
         this.onGameFinished.run();
@@ -350,7 +351,7 @@ public class Game {
         while(!q.isEmpty()) {
             Player c = q.front();
 
-            db.writeUserIntoDb(c.getUsername(), c.getHearts(), this.roundCounter);
+            db.writeUserIntoDb(c.getUsername(), c.getHearts(), this.roundCounter.get());
 
             q.dequeue();
         }
