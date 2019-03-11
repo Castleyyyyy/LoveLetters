@@ -19,7 +19,7 @@ public abstract class Server
 
    // Objekte
     private ServerSocket serverSocket;
-    private List verbindungen;
+    private List<ServerConnection> verbindungen;
     private ServerSchleife schleife;
     
     // Attribute
@@ -150,7 +150,7 @@ public abstract class Server
         
         while (verbindungen.hasAccess())
         {
-            lSerververbindung = (ServerConnection) verbindungen.getContent();
+            lSerververbindung = verbindungen.getContent();
             if (lSerververbindung.getRemoteIP().equals(pClientIP) && lSerververbindung.getRemotePort() == pClientPort)
                 return lSerververbindung;
             verbindungen.next();
@@ -184,7 +184,7 @@ public abstract class Server
         verbindungen.toFirst();
         while (verbindungen.hasAccess())
         {
-            lSerververbindung = (ServerConnection) verbindungen.getContent();
+            lSerververbindung = verbindungen.getContent();
             lSerververbindung.send(pMessage);
             verbindungen.next();
         }   
@@ -219,7 +219,7 @@ public abstract class Server
         verbindungen.toFirst();
         while (verbindungen.hasAccess())
         {
-            ServerConnection lClient = (ServerConnection) verbindungen.getContent();
+            ServerConnection lClient = verbindungen.getContent();
             if (lClient == pVerbindung)
                 verbindungen.remove();
             verbindungen.next();
