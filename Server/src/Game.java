@@ -145,6 +145,9 @@ public class Game {
             players.dequeue();
             p.giveCard(this.drawCard());
         }
+
+        this.roundCounter.incrementAndGet();
+        this.writeResultsToDB();
     } // end of nextRound
 
     private Card drawCard() {
