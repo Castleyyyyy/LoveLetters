@@ -32,15 +32,15 @@ public class GameServer extends Server {
     System.out.println("Player "+ player.getUsername() + " has been eliminated.");
   }
   
-  void onCardsSwapped(Pair<Player, Player> pair){
+  void onCardsSwapped(Pair<Player, Player> pair){                               // what even is this?? pair class?
     System.out.println("Players " + pair.getKey().getUsername() + " and " + pair.getValue().getUsername() + " have swapped cards.");
   }
   
-  void onReceivesNewCards(Player player, List<Card> newCards){
+  void onReceivesNewCards(Player player, List<Card> newCards){                  // no work (incompatible types)
     System.out.println("Player " + player.getUsername() + " receives new Cards.");
   }
   
-  void onPlayersCardRevealed(Player player, Card card){
+  void onPlayersCardRevealed(Player player, Card card){                         // no work (incompatible types)
     //TODO
   }
   
@@ -50,11 +50,38 @@ public class GameServer extends Server {
 
   @Override
   void processNewConnection(String pClientIP, int pClientPort) {
+    send(pClientIP, pClientPort, "+NAME");
   }
 
   @Override
   void processMessage(String pClientIP, int pClientPort, String pMessage) {
-
+    switch (pMessage.split(":")[0]) {
+      case  USERNAME: 
+        if (pMessage.split(":").length == 1) {
+          send(pClientIP, pClientPort, "-FAIL:ENTER_USERNAME");
+          break;
+        } 
+        
+        String name = pMessage.split(":")[1];
+        if (name == null) {
+          send(pClientIP, pClientPort, "-FAIL:ENTER_USERNAME");
+          break;
+        }
+        
+        if (game.getPlayerByUsername(name) != null) {
+          send(pClientIP, pClientPort, "-FAIL:USER_ALREADY_EXISTS");
+          break;
+        }
+        
+        send(pClientIP, pClientPort, "+OK");
+        sendToAll("+USER_JOINED:" + name);
+        break;
+      case  : 
+        
+        break;
+      default: 
+        
+    } // end of switch
   }
 
   @Override
