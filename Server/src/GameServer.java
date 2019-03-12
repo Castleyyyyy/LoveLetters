@@ -1,6 +1,7 @@
 public class GameServer extends Server {
 
   Game game;
+  List<Player> users = new List<Player>();         // list of players on server, NOT NECESSARILY list of players in game
 
 
   public GameServer(int pPortNr) {
@@ -56,7 +57,7 @@ public class GameServer extends Server {
   @Override
   void processMessage(String pClientIP, int pClientPort, String pMessage) {
     switch (pMessage.split(":")[0]) {
-      case  USERNAME: 
+      case  "USERNAME": 
         if (pMessage.split(":").length == 1) {
           send(pClientIP, pClientPort, "-FAIL:ENTER_USERNAME");
           break;
@@ -73,10 +74,16 @@ public class GameServer extends Server {
           break;
         }
         
+        Player user = new Player();
+        user.setIP(pClientIP);
+        user.setPort(pClientPort);
+        user.setUsername(name);
+        users.append(user);
+        
         send(pClientIP, pClientPort, "+OK");
         sendToAll("+USER_JOINED:" + name);
         break;
-      case  : 
+      case  "JOIN_GAME": 
         
         break;
       default: 

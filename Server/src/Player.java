@@ -9,6 +9,7 @@ public class Player {
   private int port;
 
   private List<Card> cards;
+  
 
   public boolean isProtected() {
     return isProtected;
