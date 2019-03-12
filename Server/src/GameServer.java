@@ -11,8 +11,9 @@ public class GameServer extends Server {
       () -> {},
       () -> {},
       this::onCardPlayed,
-        ()->{},
-            this::onPlayerEliminated
+      ()->{},
+      this::onPlayerEliminated
+    
     );
   }
 
@@ -27,6 +28,7 @@ public class GameServer extends Server {
   void onPlayerEliminated(Player player){
     System.out.println("Player "+ player.getUsername() + " has been eliminated.");
   }
+  
 
   @Override
   void processNewConnection(String pClientIP, int pClientPort) {
@@ -39,7 +41,7 @@ public class GameServer extends Server {
 
   @Override
   void processClosedConnection(String pClientIP, int pClientPort) {
-
+    this.sendToAll("+USER_QUIT:" + game.getPlayerByIPAndPort(pClientIP, pClientPort).getUsername());
   }
 
 } // end of class GameServer
