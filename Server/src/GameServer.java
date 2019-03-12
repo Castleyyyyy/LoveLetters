@@ -51,6 +51,11 @@ public class GameServer extends Server {
 
   @Override
   void processNewConnection(String pClientIP, int pClientPort) {
+    Player user = new Player();
+    user.setIP(pClientIP);
+    user.setPort(pClientPort);
+    users.append(user);
+    
     send(pClientIP, pClientPort, "+NAME");
   }
 
@@ -58,6 +63,11 @@ public class GameServer extends Server {
   void processMessage(String pClientIP, int pClientPort, String pMessage) {
     switch (pMessage.split(":")[0]) {
       case  "USERNAME": 
+        if (this.currentUserByIPandPort(pClientIP, pClientPort).getUsername() != null) {
+          send(pClientIP, pClientPort, "-FAIL:ALREADY_NAMED");
+          break;
+        } 
+        
         if (pMessage.split(":").length == 1) {
           send(pClientIP, pClientPort, "-FAIL:ENTER_USERNAME");
           break;
@@ -74,17 +84,14 @@ public class GameServer extends Server {
           break;
         }
         
-        Player user = new Player();
-        user.setIP(pClientIP);
-        user.setPort(pClientPort);
+        Player user = this.currentUserByIPandPort(pClientIP, pClientPort);
         user.setUsername(name);
-        users.append(user);
         
         send(pClientIP, pClientPort, "+OK");
         sendToAll("+USER_JOINED:" + name);
         break;
       case  "JOIN_GAME": 
-        
+        //TODO
         break;
       default: 
         
@@ -94,6 +101,23 @@ public class GameServer extends Server {
   @Override
   void processClosedConnection(String pClientIP, int pClientPort) {
     this.sendToAll("+USER_QUIT:" + game.getPlayerByIPAndPort(pClientIP, pClientPort).getUsername());
+    //TODO remove user from userlist
+  }
+  
+  
+  /* returns the user from the userlist using given IP and Port
+   *
+   *@param pClientIP IP of the user in question
+   *@param pClientPort Port of the user in question
+   *
+   */
+  Player currentUserByIPandPort(String pClientIP, int pClientPort){
+    for (users.toFirst(); users.hasAccess(); users.next()) {
+      if (this.users.getContent().getIP().equals(pClientIP) && this.users.getContent().getPort() == pClientPort) {
+        return this.users.getContent();
+      }
+    } // end of for
+    return null;
   }
 
 } // end of class GameServer
