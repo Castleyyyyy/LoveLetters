@@ -6,6 +6,7 @@ public class Player {
 
   private String username;
   private String ip;
+  private int port;
 
   private List<Card> cards;
 
@@ -45,12 +46,20 @@ public class Player {
     this.username = username;
   }
 
-  public String getIp() {
+  public String getIP() {
     return ip;
   }
 
-  public void setIp(String ip) {
+  public void setIP(String ip) {
     this.ip = ip;
+  }
+  
+  public int getPort(){
+    return this.port;
+  }
+  
+  public void setPort(int pPort){
+    this.port = pPort;
   }
 
   public List<Card> getCards() {
