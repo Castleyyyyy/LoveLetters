@@ -12,8 +12,11 @@ public class GameServer extends Server {
       () -> {},
       this::onCardPlayed,
       ()->{},
-      this::onPlayerEliminated
-    
+      this::onPlayerEliminated,
+      this::onCardsSwapped,
+      this::onReceivesNewCards,
+      this::onPlayersCardRevealed,
+      this::onCardRevealedToSinglePlayer
     );
   }
 
@@ -29,6 +32,21 @@ public class GameServer extends Server {
     System.out.println("Player "+ player.getUsername() + " has been eliminated.");
   }
   
+  void onCardsSwapped(Pair<Player, Player> pair){
+    System.out.println("Players " + pair.getKey().getUsername() + " and " + pair.getValue().getUsername() + " have swapped cards.");
+  }
+  
+  void onReceivesNewCards(Player player, List<Card> newCards){
+    System.out.println("Player " + player.getUsername() + " receives new Cards.");
+  }
+  
+  void onPlayersCardRevealed(Player player, Card card){
+    //TODO
+  }
+  
+  void onCardRevealedToSinglePlayer(CardRevealedToSinglePlayerPayload payload){
+    //TODO
+  } 
 
   @Override
   void processNewConnection(String pClientIP, int pClientPort) {
