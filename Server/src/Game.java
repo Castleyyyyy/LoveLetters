@@ -377,6 +377,23 @@ public class Game {
     } // end of for
     return null;
   } 
+  
+  /**
+     * Return player using given username.
+     * @param pClientName Username of the player in question.
+     */
+  Player getPlayerByUsername(String pClientName){
+    Queue<Player> tempQ = this.playerBase.getCopyOfPlayers();
+    
+    for (int i = 0; i < this.playerBase.getNumberOfPlayers(); i++) {
+      if (tempQ.front().getUsername().equals(pClientName)) {
+        return tempQ.front();
+      } else {
+        tempQ.dequeue();
+      } // end of if-else
+    } // end of for
+    return null;
+  } 
 
   static class GameIsPendingException extends Exception {
   }
