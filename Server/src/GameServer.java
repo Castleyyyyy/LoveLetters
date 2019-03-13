@@ -142,6 +142,18 @@ public class GameServer extends Server {
         send(pClientIP, pClientPort, "+OK");
         sendToAll("+GAME_STARTED");
         break;
+      case "PLAY_CARD":
+        //TODO
+        
+        break;
+      case "PROTECTED_PLAYERS":
+        //TODO
+        
+        break;
+      case "HELP":
+        //TODO
+        
+        break;
       case "END_GAME":
         try {
           game.endGame(currentUser);
@@ -151,6 +163,22 @@ public class GameServer extends Server {
         } 
         
         send(pClientIP, pClientPort, "+OK");
+        break;
+      case "RANK":
+        //TODO
+        
+        break;
+      case "LIST_CARDS":
+        //TODO
+        
+        break;
+      case "EXIT_GAME":
+        //TODO
+        
+        break;
+      case "QUIT":
+        //TODO
+        
         break;
       default: 
         send(pClientIP, pClientPort, "-FAIL:UNKNOWN_ENTRY");
