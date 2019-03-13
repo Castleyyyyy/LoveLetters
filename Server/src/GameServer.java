@@ -63,9 +63,11 @@ public class GameServer extends Server {
 
   @Override
   void processMessage(String pClientIP, int pClientPort, String pMessage) {
+    Player currentUser = this.currentUserByIPandPort(pClientIP, pClientPort);
+    
     switch (pMessage.split(":")[0]) {
       case  "USERNAME": 
-        if (this.currentUserByIPandPort(pClientIP, pClientPort).getUsername() != null) {
+        if (currentUser.getUsername() != null) {
           send(pClientIP, pClientPort, "-FAIL:ALREADY_NAMED");
           break;
         } 
@@ -86,17 +88,35 @@ public class GameServer extends Server {
           break;
         }
         
-        Player user = this.currentUserByIPandPort(pClientIP, pClientPort);
-        user.setUsername(name);
+        currentUser.setUsername(name);
         
         send(pClientIP, pClientPort, "+OK");
         sendToAll("+USER_JOINED:" + name);
         break;
       case  "JOIN_GAME": 
-        //TODO
+        if (currentUser.getUsername() == null) {
+          send(pClientIP, pClientPort, "-FAIL:NO_NAME");
+          break;
+        } 
+        
+        try {
+          game.joinGame(currentUser);
+        } catch(Game.GameIsPendingException e) {
+          send(pClientIP, pClientPort, "-FAIL:GAME_IS_PENDING");
+          break;
+        } catch(Game.GameIsPackedException e) {
+          send(pClientIP, pClientPort, "-FAIL:GAME_IS_PACKED");
+          break;
+        } catch(PlayerBase.DuplicatePlayerException e){
+          send(pClientIP, pClientPort, "-FAIL:DUPLICATE_PLAYER");
+          break;
+        }
+        
+        send(pClientIP, pClientPort, "+OK");
+        sendToAll("+PLAYER_JOINED:" + currentUser.getUsername());
         break;
       default: 
-        
+        send(pClientIP, pClientPort, "-FAIL:UNKNOWN_ENTRY");
     } // end of switch
   }
 

@@ -393,7 +393,8 @@ public class Game {
       } // end of if-else
     } // end of for
     return null;
-  } 
+  }
+   
 
   static class GameIsPendingException extends Exception {
   }
