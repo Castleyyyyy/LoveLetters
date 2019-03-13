@@ -163,8 +163,25 @@ public class GameServer extends Server {
         
         break;
       case "HELP":
-        //TODO
+        if (!game.isPartOfPlayerBase(currentUser)) {
+          send(pClientIP, pClientPort, "-FAIL:NOT_IN_GAME");
+          break;
+        }
         
+        if (pMessage.split(":").length < 2) {                                   // user didn't enter a cardname
+          send(pClientIP, pClientPort, "-FAIL:CARDNAME_ILLEGAL");
+          break;
+        } 
+        
+        String help = "+HELP:";
+        try {
+          help = help + game.getCardHelp(pMessage.split(":")[1]);
+        } catch(Game.InvalidCardNameException e) {
+          send(pClientIP, pClientPort, "-FAIL:CARDNAME_ILLEGAL");
+          break;
+        } 
+        
+        send(pClientIP, pClientPort, help);
         break;
       case "END_GAME":
         try {

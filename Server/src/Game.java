@@ -6,6 +6,7 @@ import java.util.Random;
 
 public class Game {
   private Stack<Card> cardStack = new Stack<>();
+  private List<Card> cardList = new List<Card>();   // a list containing all available cards for reference purposes (e.g. for the getHelp-method)
 
   private GamePhase phase = GamePhase.STARTING;
   private PlayerBase playerBase = new PlayerBase();
@@ -37,6 +38,15 @@ public class Game {
     this.onCardRevealedToSinglePlayer = onCardRevealedToSinglePlayer;
     
     this.db = new Database("127.0.0.1", 3306, "abimotto", "root", "");
+    
+    this.cardList.append(new Guard());
+    this.cardList.append(new Priest());
+    this.cardList.append(new Baron());
+    this.cardList.append(new Maid());
+    this.cardList.append(new Prince());
+    this.cardList.append(new King());
+    this.cardList.append(new Countess());
+    this.cardList.append(new Princess());
   }
 
   List<Player> getProtectedPlayers() {
@@ -425,12 +435,25 @@ public class Game {
   
   /**
      * Determine whether a player is part of the player base.
-     *@param player The player in question
+     * @param player The player in question
      *
      */
   boolean isPartOfPlayerBase(Player player){
     return this.playerBase.hasPlayer(player);
   }
+  
+  /**
+     * Find card with given name and return its help.
+     * @param Name of the card in question.
+     */
+  String getCardHelp(String cardName) throws InvalidCardNameException{
+    for (this.cardList.toFirst(); this.cardList.hasAccess(); this.cardList.next()) {
+      if (this.cardList.getContent().hasName(cardName.toUpperCase())) {
+        return this.cardList.getContent().getHelp();
+      } 
+    } // end of for
+    throw new InvalidCardNameException();
+  } 
 
   static class GameIsPendingException extends Exception {
   }
@@ -442,6 +465,9 @@ public class Game {
   }
 
   static class NotInGameException extends Exception {
+  }
+  
+  static class InvalidCardNameException extends Exception {
   }
 
 }
