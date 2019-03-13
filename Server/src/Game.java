@@ -14,7 +14,7 @@ public class Game {
   private AtomicInteger roundCounter = new AtomicInteger(0);
 
   private Consumer<Player> onPlayerJoined;
-  private Runnable onGameFinished;
+  private Consumer<List<Player>> onGameFinished;
   private Runnable onGameStarted;
   private Consumer<Card> onCardPlayed;
   private Runnable onRoundFinished;
@@ -24,7 +24,7 @@ public class Game {
   private Consumer<Pair<Player, Card>> onCardRevealedToAll;
   private Consumer<CardRevealedToSinglePlayerPayload> onCardRevealedToSinglePlayer;
 
-  public Game(Consumer<Player> onPlayerJoined, Runnable onGameFinished, Runnable onGameStarted, Consumer<Card> onCardPlayed, Runnable onRoundFinished, Consumer<Player> onPlayerEliminated, Consumer<Pair<Player, Player>> onCardsSwapped, Consumer<Pair<Player, List<Card>>> onReceivesNewCards, Consumer<Pair<Player, Card>> onPlayersCardRevealed, Consumer<CardRevealedToSinglePlayerPayload> onCardRevealedToSinglePlayer) {
+  public Game(Consumer<Player> onPlayerJoined, Consumer<List<Player>> onGameFinished, Runnable onGameStarted, Consumer<Card> onCardPlayed, Runnable onRoundFinished, Consumer<Player> onPlayerEliminated, Consumer<Pair<Player, Player>> onCardsSwapped, Consumer<Pair<Player, List<Card>>> onReceivesNewCards, Consumer<Pair<Player, Card>> onPlayersCardRevealed, Consumer<CardRevealedToSinglePlayerPayload> onCardRevealedToSinglePlayer) {
     this.onPlayerJoined = onPlayerJoined;
     this.onGameFinished = onGameFinished;
     this.onGameStarted = onGameStarted;
@@ -126,7 +126,7 @@ public class Game {
       this.onRoundFinished.run();
       
       if (this.playerBase.getCurrentPlayer().getHearts() == this.playerBase.getRequiredHearts()) {        // if game finished
-        this.onGameFinished.run();
+        this.onGameFinished.accept(this.getWinners());
         this.phase = GamePhase.FINISHED;                                        // anything missing here??
       } else {
         nextRound();                                                            // continue with next round if game not finished
@@ -180,7 +180,7 @@ public class Game {
      */
   void switchCards(Player targetPlayer) {
     if (targetPlayer.isProtected()) {
-      // TODO:
+      // TODO: vielleicht ne boolean methode draus machen und hier false zurückgeben?
     }
     Player currentPlayer = this.playerBase.getCurrentPlayer();
     List<Card> currentCards = currentPlayer.getCards();
@@ -342,7 +342,7 @@ public class Game {
     this.roundCounter.incrementAndGet();
     this.writeResultsToDB();
     this.phase = GamePhase.FINISHED;
-    this.onGameFinished.run();
+    this.onGameFinished.accept(this.getWinners());
   } // end of endGame
 
     /**
@@ -394,6 +394,33 @@ public class Game {
     } // end of for
     return null;
   }
+  
+  
+  /**
+     * Determine player(s) with most hearts by making a list of players with max
+     * hearts and override it when player with more than max hearts is found.
+     */
+  List<Player> getWinners(){
+    Queue<Player> tempQ = this.playerBase.getCopyOfPlayers();
+    List<Player> result = new List<Player>();
+    int max = 0;
+    
+    for (int i = 0; i < this.playerBase.getNumberOfPlayers(); i++) {
+      if (tempQ.front().getHearts() == max) {
+        result.append(tempQ.front());
+      } 
+      
+      if (tempQ.front().getHearts() > max) {
+        result = new List<Player>();
+        result.append(tempQ.front());
+        max = tempQ.front().getHearts();
+      } 
+      
+      tempQ.dequeue();
+    } // end of for
+    
+    return result;
+  } 
    
 
   static class GameIsPendingException extends Exception {

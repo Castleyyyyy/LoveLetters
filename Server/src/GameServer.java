@@ -11,7 +11,7 @@ public class GameServer extends Server {
 
     game = new Game(
       this::onPlayerJoined,
-      () -> {},
+      this::onGameFinished,
       () -> {},
       this::onCardPlayed,
       ()->{},
@@ -25,6 +25,16 @@ public class GameServer extends Server {
 
   void onPlayerJoined(Player player) {
     System.out.println("Hallo, ich bin gejoined");
+  }
+  
+  void onGameFinished(List<Player> winners){
+    String result = "+GAME_FINISHED:";
+    for (winners.toFirst(); winners.hasAccess(); winners.next()) {
+      result = result + winners.getContent().getUsername() + ",";
+    } // end of for
+    
+    result = result.substring(0, result.lastIndexOf(","));
+    this.sendToAll(result);;
   }
 
   void onCardPlayed(Card card) {
@@ -131,6 +141,16 @@ public class GameServer extends Server {
         
         send(pClientIP, pClientPort, "+OK");
         sendToAll("+GAME_STARTED");
+        break;
+      case "END_GAME":
+        try {
+          game.endGame(currentUser);
+        } catch(Game.NotInGameException e) {
+          send(pClientIP, pClientPort, "-FAIL:NOT_IN_GAME");
+          break;
+        } 
+        
+        send(pClientIP, pClientPort, "+OK");
         break;
       default: 
         send(pClientIP, pClientPort, "-FAIL:UNKNOWN_ENTRY");
