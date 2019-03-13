@@ -421,7 +421,16 @@ public class Game {
     
     return result;
   } 
-   
+  
+  
+  /**
+     * Determine whether a player is part of the player base.
+     *@param player The player in question
+     *
+     */
+  boolean isPartOfPlayerBase(Player player){
+    return this.playerBase.hasPlayer(player);
+  }
 
   static class GameIsPendingException extends Exception {
   }

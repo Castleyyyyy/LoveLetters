@@ -8,21 +8,21 @@ public class GameServer extends Server {
 
   public GameServer(int pPortNr) {
     super(pPortNr);
-
+    
     game = new Game(
-      this::onPlayerJoined,
-      this::onGameFinished,
-      () -> {},
-      this::onCardPlayed,
-      ()->{},
-      this::onPlayerEliminated,
-      this::onCardsSwapped,
-      this::onReceivesNewCards,
-      this::onPlayersCardRevealed,
-      this::onCardRevealedToSinglePlayer
+    this::onPlayerJoined,
+    this::onGameFinished,
+    () -> {},
+    this::onCardPlayed,
+    ()->{},
+    this::onPlayerEliminated,
+    this::onCardsSwapped,
+    this::onReceivesNewCards,
+    this::onPlayersCardRevealed,
+    this::onCardRevealedToSinglePlayer
     );
   }
-
+  
   void onPlayerJoined(Player player) {
     System.out.println("Hallo, ich bin gejoined");
   }
@@ -30,17 +30,17 @@ public class GameServer extends Server {
   void onGameFinished(List<Player> winners){
     String result = "+GAME_FINISHED:";
     for (winners.toFirst(); winners.hasAccess(); winners.next()) {
-      result = result + winners.getContent().getUsername() + ",";
+      result = result + winners.getContent().getUsername() + ":";
     } // end of for
     
-    result = result.substring(0, result.lastIndexOf(","));
-    this.sendToAll(result);;
+    result = result.substring(0, result.lastIndexOf(":"));
+    this.sendToAll(result);
   }
 
   void onCardPlayed(Card card) {
     System.out.println("Card was played");
   }
-
+  
   void onPlayerEliminated(Player player){
     System.out.println("Player "+ player.getUsername() + " has been eliminated.");
   }
@@ -60,7 +60,7 @@ public class GameServer extends Server {
   void onCardRevealedToSinglePlayer(CardRevealedToSinglePlayerPayload payload){
     //TODO
   } 
-
+  
   @Override
   void processNewConnection(String pClientIP, int pClientPort) {
     Player user = new Player();
@@ -70,7 +70,7 @@ public class GameServer extends Server {
     
     send(pClientIP, pClientPort, "+NAME");
   }
-
+  
   @Override
   void processMessage(String pClientIP, int pClientPort, String pMessage) {
     Player currentUser = this.currentUserByIPandPort(pClientIP, pClientPort);
@@ -147,7 +147,19 @@ public class GameServer extends Server {
         
         break;
       case "PROTECTED_PLAYERS":
-        //TODO
+        if (!game.isPartOfPlayerBase(currentUser)) {
+          send(pClientIP, pClientPort, "-FAIL:NOT_IN_GAME");
+          break;
+        } 
+        
+        List<Player> protectedPlayers = game.getProtectedPlayers();
+        String result = "+PROTECTED_PLAYERS:";
+        for (protectedPlayers.toFirst(); protectedPlayers.hasAccess(); protectedPlayers.next()) {
+          result = result + protectedPlayers.getContent().getUsername() + ":";
+        } // end of for
+        
+        result = result.substring(0, result.lastIndexOf(":")); 
+        send(pClientIP, pClientPort, result);
         
         break;
       case "HELP":
@@ -169,7 +181,6 @@ public class GameServer extends Server {
         
         break;
       case "LIST_CARDS":
-        //TODO
         
         break;
       case "EXIT_GAME":
@@ -184,7 +195,7 @@ public class GameServer extends Server {
         send(pClientIP, pClientPort, "-FAIL:UNKNOWN_ENTRY");
     } // end of switch
   }
-
+  
   @Override
   void processClosedConnection(String pClientIP, int pClientPort) {
     this.sendToAll("+USER_QUIT:" + game.getPlayerByIPAndPort(pClientIP, pClientPort).getUsername());
@@ -193,10 +204,10 @@ public class GameServer extends Server {
   
   
   /* returns the user from the userlist using given IP and Port
-   *
-   *@param pClientIP IP of the user in question
-   *@param pClientPort Port of the user in question
-   *
+  *
+  *@param pClientIP IP of the user in question
+  *@param pClientPort Port of the user in question
+  *
    */
   Player currentUserByIPandPort(String pClientIP, int pClientPort){
     for (users.toFirst(); users.hasAccess(); users.next()) {
@@ -206,5 +217,5 @@ public class GameServer extends Server {
     } // end of for
     return null;
   }
-
+  
 } // end of class GameServer
