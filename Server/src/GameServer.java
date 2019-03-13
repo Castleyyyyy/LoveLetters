@@ -1,3 +1,5 @@
+import javafx.util.Pair;
+
 public class GameServer extends Server {
 
   Game game;
@@ -33,15 +35,15 @@ public class GameServer extends Server {
     System.out.println("Player "+ player.getUsername() + " has been eliminated.");
   }
   
-  void onCardsSwapped(Pair<Player, Player> pair){                               // what even is this?? pair class?
+  void onCardsSwapped(Pair<Player, Player> pair){                               
     System.out.println("Players " + pair.getKey().getUsername() + " and " + pair.getValue().getUsername() + " have swapped cards.");
   }
   
-  void onReceivesNewCards(Player player, List<Card> newCards){                  // no work (incompatible types)
-    System.out.println("Player " + player.getUsername() + " receives new Cards.");
+  void onReceivesNewCards(Pair<Player, List<Card>> pair){                       
+    System.out.println("Player " + pair.getKey().getUsername() + " receives new Cards.");
   }
   
-  void onPlayersCardRevealed(Player player, Card card){                         // no work (incompatible types)
+  void onPlayersCardRevealed(Pair<Player, Card> pair){                          
     //TODO
   }
   
