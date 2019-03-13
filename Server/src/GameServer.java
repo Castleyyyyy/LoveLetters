@@ -115,6 +115,23 @@ public class GameServer extends Server {
         send(pClientIP, pClientPort, "+OK");
         sendToAll("+PLAYER_JOINED:" + currentUser.getUsername());
         break;
+      case "START_GAME":
+        try {
+          game.startGame(currentUser);
+        } catch(Game.GameIsPendingException e) {
+          send(pClientIP, pClientPort, "-FAIL:GAME_IS_PENDING");
+          break;
+        } catch(Game.NotInGameException e) {
+          send(pClientIP, pClientPort, "-FAIL:NOT_IN_GAME");
+          break;
+        } catch(Game.NotEnoughPlayersException e){
+          send(pClientIP, pClientPort, "-FAIL:NOT_ENOUGH_PLAYERS");
+          break;
+        }
+        
+        send(pClientIP, pClientPort, "+OK");
+        sendToAll("+GAME_STARTED");
+        break;
       default: 
         send(pClientIP, pClientPort, "-FAIL:UNKNOWN_ENTRY");
     } // end of switch
