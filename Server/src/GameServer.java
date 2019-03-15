@@ -42,7 +42,7 @@ public class GameServer extends Server {
   }
   
   void onPlayerEliminated(Player player){
-    System.out.println("Player "+ player.getUsername() + " has been eliminated.");
+    sendToAll("+PLAYER_OUT:"+ player.getUsername());
   }
   
   void onCardsSwapped(Pair<Player, Player> pair){                               
@@ -207,8 +207,18 @@ public class GameServer extends Server {
         send(pClientIP, pClientPort, playerCards);
         break;
       case "EXIT_GAME":
-        //TODO
+        try {
+          game.eliminatePlayer(currentUser);
+        } catch(Game.NotInGameException e) {
+          send(pClientIP, pClientPort, "-FAIL:NOT_IN_GAME");
+          break;
+        } 
         
+        currentUser.resetHearts();
+        currentUser.setCards(new List<Card>());
+        
+        send(pClientIP, pClientPort, "+OK");
+        sendToAll("+USER_EXITED:" + currentUser.getUsername());
         break;
       case "QUIT":
         //TODO

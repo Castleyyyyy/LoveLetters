@@ -174,9 +174,14 @@ public class Game {
      *
      * @param player The player who got eliminated.
      */
-  void eliminatePlayer(Player player) {
-    player.setInGame(false);
-    this.onPlayerEliminated.accept(player);
+  void eliminatePlayer(Player player) throws NotInGameException{
+    if (!this.isPartOfPlayerBase(player)) {
+      throw new NotInGameException();
+    } else {
+      player.setInGame(false);
+      player.setProtected(false);
+      this.onPlayerEliminated.accept(player);
+    } // end of if-else
   }
 
     /**
@@ -223,7 +228,11 @@ public class Game {
     this.onCardRevealedToAll.accept(new Pair<>(targetPlayer, firstCard));
     
     if (firstCard.hasName(Princess.NAME)) {
-      eliminatePlayer(targetPlayer);
+      try {
+        eliminatePlayer(targetPlayer);
+      } catch(NotInGameException e) {
+        
+      }
     }
     
     
@@ -295,9 +304,19 @@ public class Game {
     int numberTarget = targetCard.getContent().getNumber();
     
     if (numberCurrent > numberTarget) {
-      eliminatePlayer(targetPlayer);
+      try {
+        eliminatePlayer(targetPlayer);
+      } catch(NotInGameException e) {
+        
+      }
     }else if (numberCurrent < numberTarget) {
-      eliminatePlayer(this.playerBase.getCurrentPlayer());
+      try {
+        eliminatePlayer(this.playerBase.getCurrentPlayer());
+      } catch(Exception e) {
+        
+      } finally {
+        
+      } // end of try
     }
   }
 
@@ -317,7 +336,13 @@ public class Game {
     cards.toFirst();
     if (cards.getContent().getName().equals(guess)) {
       // TODO: Send message what was guessed.
-      eliminatePlayer(targetPlayer);
+      try {
+        eliminatePlayer(targetPlayer);
+      } catch(Exception e) {
+        
+      } finally {
+        
+      } // end of try
     }else {
       // TODO: Send message to all what was guessed and that it is wrong.
     }
