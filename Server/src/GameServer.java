@@ -194,8 +194,13 @@ public class GameServer extends Server {
         send(pClientIP, pClientPort, "+OK");
         break;
       case "RANK":
-        //TODO
+        if (!game.isPartOfPlayerBase(currentUser)) {
+          send(pClientIP, pClientPort, "-FAIL:NOT_IN_GAME");
+          break;
+        } 
         
+        String ranking = "+RANK" + game.printRanking();
+        send(pClientIP, pClientPort, ranking);
         break;
       case "LIST_CARDS":
         if (!game.isPartOfPlayerBase(currentUser)) {

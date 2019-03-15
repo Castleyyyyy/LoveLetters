@@ -137,7 +137,7 @@ public class Game {
       this.onRoundFinished.run();
       
       if (this.playerBase.getCurrentPlayer().getHearts() == this.playerBase.getRequiredHearts()) {        // if game finished
-        this.onGameFinished.accept(this.getWinners());
+        this.onGameFinished.accept(this.getWinners(playerBase.getCopyOfPlayers()));
         this.phase = GamePhase.FINISHED;                                        // anything missing here??
       } else {
         nextRound();                                                            // continue with next round if game not finished
@@ -378,7 +378,7 @@ public class Game {
     this.roundCounter.incrementAndGet();
     this.writeResultsToDB();
     this.phase = GamePhase.FINISHED;
-    this.onGameFinished.accept(this.getWinners());
+    this.onGameFinished.accept(this.getWinners(playerBase.getCopyOfPlayers()));
   } // end of endGame
 
     /**
@@ -436,8 +436,7 @@ public class Game {
      * Determine player(s) with most hearts by making a list of players with max
      * hearts and override it when player with more than max hearts is found.
      */
-  List<Player> getWinners(){
-    Queue<Player> tempQ = this.playerBase.getCopyOfPlayers();
+  List<Player> getWinners(Queue<Player> tempQ){
     List<Player> result = new List<Player>();
     int max = 0;
     
@@ -494,6 +493,41 @@ public class Game {
     
     cards = cards.substring(0, cards.lastIndexOf(":"));  // cut off ":" at the end
     return cards;
+  }
+  
+  /**
+     * Returns a String containing the current ranking (usernames and hearts) in format 
+     * <player1>,<player2>,<player3>,<player4>:<hearts1>,<hearts2>,<hearts3>,<hearts4>
+     * using the getWinners method multiple times
+     */
+  String printRanking(){
+    Queue tempQ = this.playerBase.getCopyOfPlayers();
+    String playerNames = "";
+    String playerHearts = "";
+    List<Player> rank = new List<Player>();
+    
+    while (!tempQ.isEmpty()) {  // this is kinda complicated, not sure if it works or if there is a more simple way
+      rank.concat(getWinners(tempQ));
+      for (int i = 0; i < QueueUtils.getSize(tempQ); i++) {
+        for (rank.toFirst(); rank.hasAccess(); rank.next()) {
+          if (rank.getContent() == tempQ.front()) {
+            tempQ.dequeue();
+          } 
+        } // end of for
+        
+        tempQ.enqueue(tempQ.front());
+        tempQ.dequeue();
+      } // end of for
+    } // end of while
+    
+    for (rank.toFirst(); rank.hasAccess(); rank.next()) {
+      playerNames = playerNames + rank.getContent().getUsername() + ",";
+      
+      playerHearts = playerHearts + rank.getContent().getHeartsAsString() + ",";
+    } // end of for
+    
+    String result = playerNames.substring(0, playerNames.lastIndexOf(",")) + ":" + playerHearts.substring(0, playerHearts.lastIndexOf(","));
+    return result;
   }
   
   /**

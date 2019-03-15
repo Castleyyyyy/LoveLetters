@@ -31,6 +31,10 @@ public class Player {
     return this.hearts;
   } 
   
+  public String getHeartsAsString(){
+    return Integer.toString(this.hearts);
+  }
+  
   public void addHeart(){
     this.hearts++;
   }
