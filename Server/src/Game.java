@@ -495,6 +495,24 @@ public class Game {
     cards = cards.substring(0, cards.lastIndexOf(":"));  // cut off ":" at the end
     return cards;
   }
+  
+  /**
+     * Eliminates a player from the game, removes him from the playerBase and
+     * resets his hearts and his card list.
+     *
+     * @param player The player in question.
+     */
+  void removePlayerFromBase(Player player) throws NotInGameException{
+    try {
+      this.eliminatePlayer(player);
+    } catch(NotInGameException e) {
+      throw e;
+    } 
+    
+    player.resetHearts();
+    player.setCards(new List<Card>());
+    this.playerBase.removePlayer(player);
+  }
 
   static class GameIsPendingException extends Exception {
   }

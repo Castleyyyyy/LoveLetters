@@ -208,21 +208,25 @@ public class GameServer extends Server {
         break;
       case "EXIT_GAME":
         try {
-          game.eliminatePlayer(currentUser);
+          game.removePlayerFromBase(currentUser);
         } catch(Game.NotInGameException e) {
           send(pClientIP, pClientPort, "-FAIL:NOT_IN_GAME");
           break;
         } 
         
-        currentUser.resetHearts();
-        currentUser.setCards(new List<Card>());
-        
         send(pClientIP, pClientPort, "+OK");
-        sendToAll("+USER_EXITED:" + currentUser.getUsername());
+        sendToAll("+PLAYER_EXITED_GAME:" + currentUser.getUsername());
         break;
       case "QUIT":
-        //TODO
+        try {
+          game.removePlayerFromBase(currentUser);
+        } catch(Game.NotInGameException e) {
+          send(pClientIP, pClientPort, "-FAIL:NOT_IN_GAME");
+          break;
+        } 
         
+        sendToAll("+PLAYER_EXITED_GAME:" + currentUser.getUsername());
+        closeConnection(pClientIP, pClientPort);
         break;
       default: 
         send(pClientIP, pClientPort, "-FAIL:UNKNOWN_ENTRY");
@@ -231,8 +235,14 @@ public class GameServer extends Server {
   
   @Override
   void processClosedConnection(String pClientIP, int pClientPort) {
+    send(pClientIP, pClientPort, "+OK");
     this.sendToAll("+USER_QUIT:" + game.getPlayerByIPAndPort(pClientIP, pClientPort).getUsername());
-    //TODO remove user from userlist
+    for (users.toFirst(); users.hasAccess(); users.next()) {
+      if (users.getContent() == game.getPlayerByIPAndPort(pClientIP, pClientPort)) {
+        users.remove();
+        return;
+      } 
+    } // end of for
   }
   
   

@@ -94,6 +94,15 @@ public class PlayerBase {
   Queue<Player> getCopyOfPlayers() {
     return QueueUtils.copy(this.players);
   }
+  
+  void removePlayer(Player player){
+    for (int i = 0; i < this.getNumberOfPlayers(); i++) {
+      if (this.players.front() != player) {
+        this.players.enqueue(this.players.front());
+      } 
+      this.players.dequeue();
+    } // end of for
+  } 
 
   static class DuplicatePlayerException extends Exception {}
 
