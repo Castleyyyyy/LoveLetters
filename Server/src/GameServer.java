@@ -143,8 +143,49 @@ public class GameServer extends Server {
         sendToAll("+GAME_STARTED");
         break;
       case "PLAY_CARD":
-        //TODO
+        String cardName = "";
+        String selectedPlayerName = "";
+        String guessedCardName = "";
+        String[] entryArray = pMessage.split(":");
         
+        if (entryArray.length > 1) {         //doing this hick-hack so we don't get any null-pointer
+          cardName = entryArray[1];
+          
+          if (entryArray.length > 2) {
+            selectedPlayerName = entryArray[2];
+            
+            if (entryArray.length > 3) {
+              guessedCardName = entryArray[3];
+            } 
+          } 
+        }
+        
+        try {
+          game.playCard(currentUser, cardName, selectedPlayerName, guessedCardName);
+        } catch(Game.NotInGameException e) {
+          send(pClientIP, pClientPort, "-FAIL:NOT_IN_GAME");
+          break;
+        } catch (Game.NotYourTurnException e){
+          send(pClientIP, pClientPort, "-FAIL:NOT_YOUR_TURN");
+          break;
+        } catch (Game.InvalidCardNameException e){
+          send(pClientIP, pClientPort, "-FAIL:CARDNAME_ILLEGAL");
+          break;
+        } catch (Game.NotYourCardException e){
+          send(pClientIP, pClientPort, "-FAIL:NOT_YOUR_CARD");
+          break;
+        } catch (Game.IllegalCardGuessException e){
+          send(pClientIP, pClientPort, "-FAIL:ILLEGAL_CARD_GUESS");
+          break;
+        } catch (Game.IllegalTargetPlayerException e){
+          send(pClientIP, pClientPort, "-FAIL:ILLEGAL_TARGET_PLAYER");
+          break;
+        } catch (Game.MustPlayCountessException e){
+          send(pClientIP, pClientPort, "-FAIL:MUST_PLAY_COUNTESS");
+          break;
+        }
+        
+        send(pClientIP, pClientPort, "+OK");
         break;
       case "PROTECTED_PLAYERS":
         if (!game.isPartOfPlayerBase(currentUser)) {
