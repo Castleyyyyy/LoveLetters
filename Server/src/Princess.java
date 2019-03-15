@@ -1,6 +1,6 @@
 public class Princess extends Card {
   
-  static String NAME = "Princess";
+  static String NAME = "PRINCESS";
   
   private int number = 8;
   
