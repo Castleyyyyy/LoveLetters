@@ -53,7 +53,68 @@ public class Game {
     return this.playerBase.getProtectedPlayers();
   }
 
-  void playCard(Player player, Card card, Player selectedPlayer, Card cardGuess) {
+  void playCard(Player player, String cardName, String selectedPlayerName, String guessedCardName) throws NotInGameException, NotYourTurnException, InvalidCardNameException, IllegalCardGuessException, IllegalTargetPlayerException, MustPlayCountessException, NotYourCardException{
+    //NotInGameException (player not part of playerBase)
+    if (!this.playerBase.hasPlayer(player)) {
+      throw new NotInGameException();
+    } 
+    
+    //NotYourTurnException (player is not current player)
+    if (this.playerBase.getCurrentPlayer() != player) {
+      throw new NotYourTurnException();
+    } 
+    
+    //InvaldiCardNameException (card doesn't exist)
+    Card card = null;
+    for (cardList.toFirst(); cardList.hasAccess(); cardList.next()) {
+      if (cardList.getContent().hasName(cardName.toUpperCase())) {
+        card = cardList.getContent();
+      } 
+    } // end of for
+    if (card == null) {
+      throw new InvalidCardNameException();
+    } 
+    
+    //NotYourCardException (player doesn't have card)
+    card = null;
+    for (player.getCards().toFirst(); player.getCards().hasAccess(); player.getCards().next()) {
+      if (player.getCards().getContent().hasName(cardName.toUpperCase())) {
+        card = player.getCards().getContent();
+      }
+    } // end of for
+    if (card == null) {
+      throw new NotYourCardException();
+    } 
+    
+    //IllegalCardGuessException (cardGuess doesn't exist OR player guessed guard)
+    if (guessedCardName.toUpperCase().equals("GUARD")) {
+      throw new IllegalCardGuessException();
+    } 
+    
+    Card guessedCard = null;
+    for (cardList.toFirst(); cardList.hasAccess(); cardList.next()) {
+      if (cardList.getContent().hasName(guessedCardName.toUpperCase())) {
+        guessedCard = cardList.getContent();
+      } 
+    } // end of for
+    if (guessedCard == null) {
+      throw new IllegalCardGuessException();
+    } 
+    
+    //IllegalTargetPlayerException (only when player isn't part of playerBase. Protected players can be targeted)
+    Player targetPlayer = this.getPlayerByUsername(selectedPlayerName);
+    if (targetPlayer == null) {
+      throw new IllegalTargetPlayerException();
+    } 
+    
+    //MustPlayCountessException (player tried to play king or prince but has countess on hand)
+    if (card.getName() == "KING" || card.getName() == "PRINCE") {
+      for (player.getCards().toFirst(); player.getCards().hasAccess(); player.getCards().next()) {
+        if (player.getCards().getContent().getName().equals("COUNTESS")) {
+          throw new MustPlayCountessException();
+        } 
+      } // end of for
+    } 
     onCardPlayed.accept(card);
   }
 
@@ -562,5 +623,19 @@ public class Game {
   
   static class InvalidCardNameException extends Exception {
   }
-
+  
+  static class NotYourTurnException extends Exception{
+  }
+  
+  static class IllegalCardGuessException extends Exception{
+  }
+  
+  static class IllegalTargetPlayerException extends Exception{
+  }
+  
+  static class MustPlayCountessException extends Exception{
+  }
+  
+  static class NotYourCardException extends Exception{
+  }
 }
