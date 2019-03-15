@@ -130,6 +130,7 @@ public class Game {
 
   void nextPlayer() {
     if (playerBase.rotate()) {
+      //TODO: nächster spieler muss eine karte ziehen
       return;
     } else {                                                                    // if round finished
       this.playerBase.getCurrentPlayer().addHeart();
@@ -444,7 +445,7 @@ public class Game {
   
   /**
      * Find card with given name and return its help.
-     * @param Name of the card in question.
+     * @param cardName Name of the card in question.
      */
   String getCardHelp(String cardName) throws InvalidCardNameException{
     for (this.cardList.toFirst(); this.cardList.hasAccess(); this.cardList.next()) {
@@ -454,6 +455,21 @@ public class Game {
     } // end of for
     throw new InvalidCardNameException();
   } 
+  
+  /**
+     * returns a string containing the players cards in format <card1>:<card2>
+     * if there is two cards, else it's just <card1>
+     * @param player The player in question
+     */
+  String printCards(Player player){
+    String cards = "";
+    for (player.getCards().toFirst(); player.getCards().hasAccess(); player.getCards().next()) {
+      cards = cards + player.getCards().getContent().getName() + ":";
+    } // end of for
+    
+    cards = cards.substring(0, cards.lastIndexOf(":"));  // cut off ":" at the end
+    return cards;
+  }
 
   static class GameIsPendingException extends Exception {
   }

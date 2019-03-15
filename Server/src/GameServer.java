@@ -198,7 +198,13 @@ public class GameServer extends Server {
         
         break;
       case "LIST_CARDS":
+        if (!game.isPartOfPlayerBase(currentUser)) {
+          send(pClientIP, pClientPort, "-FAIL:NOT_IN_GAME");
+          break;
+        } 
         
+        String playerCards = "+CARDS:" + game.printCards(currentUser);
+        send(pClientIP, pClientPort, playerCards);
         break;
       case "EXIT_GAME":
         //TODO
