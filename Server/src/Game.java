@@ -143,8 +143,7 @@ public class Game {
 
   void resetCardStack() {                                                        // put all 16 cards on cardStack (ordered)
     this.cardStack = new Stack<Card>();
-    
-    // TODO: Number of cards depending on the amount of players
+
     this.cardStack.push(new Princess());
     this.cardStack.push(new Countess());
     this.cardStack.push(new King());
@@ -194,13 +193,25 @@ public class Game {
   } // end of shuffle
 
   void nextPlayer() {
-    if (playerBase.rotate()) {
+
+
+
+    if (playerBase.rotate() && !this.cardStack.isEmpty()) {
       //TODO: nächster spieler muss eine karte ziehen
       return;
-    } else {                                                                    // if round finished
-      this.playerBase.getCurrentPlayer().addHeart();
-      this.onRoundFinished.run();
-      
+    } else {                                           // if round finished
+      if (this.cardStack.isEmpty()){
+        // If the card stack is empty, the player with the highest card gets a heart.
+        Player p = playerBase.getPlayerWithHighestCard();
+        if (p == null) return;
+
+        p.addHeart();
+        this.onRoundFinished.run();
+      }else {
+        this.playerBase.getCurrentPlayer().addHeart();
+        this.onRoundFinished.run();
+      }
+
       if (this.playerBase.getCurrentPlayer().getHearts() == this.playerBase.getRequiredHearts()) {        // if game finished
         this.onGameFinished.accept(this.getWinners(playerBase.getCopyOfPlayers()));
         this.phase = GamePhase.FINISHED;                                        // anything missing here??
@@ -221,7 +232,14 @@ public class Game {
       players.dequeue();
       p.giveCard(this.drawCard());
     }
-    
+
+    // If there are only two players, smaller stack.
+    if (this.playerBase.getNumberOfPlayers() == 2) {
+      this.drawCard();
+      this.drawCard();
+      this.drawCard();
+    }
+
     this.roundCounter.incrementAndGet();
     this.writeResultsToDB();
   } // end of nextRound
