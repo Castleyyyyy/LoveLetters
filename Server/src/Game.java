@@ -202,10 +202,13 @@ public class Game {
     } else {                                           // if round finished
       if (this.cardStack.isEmpty()){
         // If the card stack is empty, the player with the highest card gets a heart.
-        Player p = playerBase.getPlayerWithHighestCard();
+        List<Player> p = playerBase.getPlayerWithHighestCard();
         if (p == null) return;
 
-        p.addHeart();
+        for (p.toFirst(); p.hasAccess(); p.next()) {
+          p.getContent().addHeart();
+        }
+
         this.onRoundFinished.run();
       }else {
         this.playerBase.getCurrentPlayer().addHeart();

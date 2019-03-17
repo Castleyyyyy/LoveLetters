@@ -61,24 +61,31 @@ public class PlayerBase {
 
     /**
      * Benedikt Ricken
-     * getPlayerWithHighestCard returns the player whose card has the highest number.
-     * @return The player with the highest card.
+     * getPlayerWithHighestCard returns a list of players whose card have the highest number.
+     * @return The list of players with the highest card.
      */
-    Player getPlayerWithHighestCard() {
+    List<Player> getPlayerWithHighestCard() {
         if (this.players.isEmpty()) return null;
 
         Queue<Player> copy = this.getCopyOfPlayers();
-        Player highest = copy.front();
+        List<Player> highest = new List<Player>();
+        highest.append(copy.front());
 
         for (copy.dequeue(); !copy.isEmpty(); copy.dequeue()) {
-            List<Card> highestCards = highest.getCards();
+            highest.toFirst();
+            List<Card> highestCards = highest.getContent().getCards();
             highestCards.toFirst();
+            int highestNumber = highestCards.getContent().getNumber();
 
             List<Card> currentCards = copy.front().getCards();
             currentCards.toFirst();
+            int currentNumber = currentCards.getContent().getNumber();
 
-            if(highestCards.getContent().getNumber() < currentCards.getContent().getNumber()) {
-                highest = copy.front();
+            if(highestNumber < currentNumber) {
+                highest = new List<Player>();
+                highest.append(copy.front());
+            }else if (highestNumber == currentNumber) {
+                highest.append(copy.front());
             }
 
         }
