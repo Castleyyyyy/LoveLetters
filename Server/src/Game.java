@@ -37,7 +37,7 @@ public class Game {
     this.onCardRevealedToAll = onPlayersCardRevealed;
     this.onCardRevealedToSinglePlayer = onCardRevealedToSinglePlayer;
     
-    this.db = new Database("127.0.0.1", 3306, "abimotto", "root", "");
+    this.db = new Database("127.0.0.1", 3306, "loveletters", "root", "");
     
     this.cardList.append(new Guard());
     this.cardList.append(new Priest());
@@ -53,7 +53,7 @@ public class Game {
     return this.playerBase.getProtectedPlayers();
   }
 
-  void playCard(Player player, String cardName, String selectedPlayerName, String guessedCardName) throws NotInGameException, NotYourTurnException, InvalidCardNameException, IllegalCardGuessException, IllegalTargetPlayerException, MustPlayCountessException, NotYourCardException {
+  void playCard(Player player, String cardName, String selectedPlayerName, String guessedCardName) throws NotInGameException, NotYourTurnException, InvalidCardNameException, IllegalCardGuessException, IllegalTargetPlayerException, MustPlayCountessException, NotYourCardException, PlayerProtectedException {
     //NotInGameException (player not part of playerBase)
     if (!this.playerBase.hasPlayer(player)) {
       throw new NotInGameException();
@@ -100,15 +100,26 @@ public class Game {
     if (guessedCard == null) {
       throw new IllegalCardGuessException();
     }
-    
+
     //IllegalTargetPlayerException (only when player isn't part of playerBase. Protected players can be targeted)
     Player targetPlayer = this.getPlayerByUsername(selectedPlayerName);
-    if (targetPlayer == null) {
+    if (targetPlayer == null && !selectedPlayerName.equals("")) {
       throw new IllegalTargetPlayerException();
     }
-    
+
+    // When card countess or maid is played, no target player is needed.
+    if (!selectedPlayerName.equals("")) {
+      if (!(card.getName().equals("COUNTESS") || card.getName().equals("MAID"))) {
+        throw new IllegalTargetPlayerException();
+      }
+    }
+
+    if (targetPlayer.isProtected()) {
+      throw new PlayerProtectedException();
+    }
+
     //MustPlayCountessException (player tried to play king or prince but has countess on hand)
-    if (card.getName() == "KING" || card.getName() == "PRINCE") {
+    if (card.getName().equals("KING") || card.getName().equals("PRINCE")) {
       for (player.getCards().toFirst(); player.getCards().hasAccess(); player.getCards().next()) {
         if (player.getCards().getContent().getName().equals("COUNTESS")) {
           throw new MustPlayCountessException();
@@ -280,7 +291,7 @@ public class Game {
      */
   void switchCards(Player targetPlayer) {
     if (targetPlayer.isProtected()) {
-      // TODO: vielleicht ne boolean methode draus machen und hier false zurückgeben?
+      return;
     }
     Player currentPlayer = this.playerBase.getCurrentPlayer();
     List<Card> currentCards = currentPlayer.getCards();
@@ -303,7 +314,7 @@ public class Game {
      */
   void revealCardToAll(Player targetPlayer) {
     if (targetPlayer.isProtected()) {
-      // TODO
+      return;
     }
     
     List<Card> cards = targetPlayer.getCards();
@@ -323,7 +334,7 @@ public class Game {
     Card newCard = this.cardStack.top();
     
     if (newCard == null) {
-      // TODO: Message - cardStack is empty.
+      // TODO: RoundEnd! cardStack is empty.
     }
     
     List<Card> newCards = new List<Card>();
@@ -341,7 +352,7 @@ public class Game {
      */
   void revealCardToCurrentPlayer(Player targetPlayer) {
     if (targetPlayer.isProtected()) {
-      // TODO:
+      return;
     }
     
     Player currentPlayer = playerBase.getCurrentPlayer();
@@ -375,7 +386,7 @@ public class Game {
   void compareCards(Player targetPlayer) {
     
     if (targetPlayer.isProtected()) {
-      // TODO
+      return;
     }
     
     List<Card> targetCard = targetPlayer.getCards();
@@ -667,5 +678,8 @@ public class Game {
   }
 
   static class NotYourCardException extends Exception {
+  }
+
+  static class PlayerProtectedException extends Exception {
   }
 }
