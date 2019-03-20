@@ -1,3 +1,6 @@
+/**
+ * Benedikt R.
+ */
 public class King extends Card {
   private int number = 6;
   private String NAME = "KING";

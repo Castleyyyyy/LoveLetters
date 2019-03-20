@@ -1,3 +1,7 @@
+/**
+ * Benedikt R.
+ */
+
 public class Countess extends Card {
   private int number = 7;
   private String NAME =  "COUNTESS";

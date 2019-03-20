@@ -280,7 +280,7 @@ public class Game {
     } // end of if-else
   }
 
-    /**
+    /** Benedikt R.
      * switchCards gives a card to the targetPlayer
      * while it takes the card from the targetPlayer and gives it to the current player.
      * The method also sends a message to all clients that cards were switched (but not which cards).
@@ -306,7 +306,7 @@ public class Game {
     this.onReceivesNewCards.accept(new Pair<>(targetPlayer, currentCards));
   }
 
-    /**
+    /** Benedikt R.
      * revealCardToAll sends a message to all clients that a player had to reveal his card.
      * It also gives the targetPlayer a new card, despite he had a princess. In this case he gets eliminated.
      *
@@ -345,7 +345,7 @@ public class Game {
     this.onReceivesNewCards.accept(new Pair<>(targetPlayer, newCards));
   }
 
-    /**
+    /** Benedikt R.
      * revealCardToCurrentPlayer will show the card of the targetPlayer to the currentPlayer.
      *
      * @param targetPlayer
@@ -364,7 +364,7 @@ public class Game {
     this.onCardRevealedToSinglePlayer.accept(new CardRevealedToSinglePlayerPayload(targetPlayer, currentPlayer, firstCard));
   }
 
-    /**
+    /** Benedikt R.
      * protectCurrentPlayer sets the protected attribute of current player to true.
      */
   void protectCurrentPlayer() {
@@ -375,7 +375,7 @@ public class Game {
     // TODO: send message
   }
 
-    /**
+    /** Benedikt R.
      * compareCards takes the number from the card of the current player and the number from the card of the targetPlayer and compares them.
      * The player with the lower number gets eliminated. If both have the same number, nothing happens.
      * <p>
@@ -416,7 +416,7 @@ public class Game {
     }
   }
 
-    /**
+    /**  Benedikt R.
      * guessCard lets the current player guess a card of one of the other players.
      * However he cannot guess the card "guard".
      * If his guess is correct, the targetPlayer gets eliminated.
@@ -425,8 +425,8 @@ public class Game {
      * @param guess        Name of the guessed card.
      */
   void guessCard(Player targetPlayer, String guess) {
-    if (targetPlayer.isProtected()) ; // TODO:
-    if (guess.equals(Guard.NAME)) ; // TODO:
+    if (targetPlayer.isProtected()) return;
+    if (guess.equals(Guard.NAME)) return;
     
     List<Card> cards = targetPlayer.getCards();
     
@@ -446,7 +446,7 @@ public class Game {
     
   }
 
-    /**
+    /** Benedikt R.
      * removeCurrentCard removes the card which has been played, so it can not be reused.
      *
      * @param cardname The name of the card which has been played.
@@ -479,7 +479,7 @@ public class Game {
     this.onGameFinished.accept(this.getWinners(playerBase.getCopyOfPlayers()));
   } // end of endGame
 
-    /**
+    /** Benedikt R.
      * writeResultsToDB writes every user to the database.
      */
   void writeResultsToDB() {

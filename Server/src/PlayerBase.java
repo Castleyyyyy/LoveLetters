@@ -60,7 +60,7 @@ public class PlayerBase {
     }
 
     /**
-     * Benedikt Ricken
+     * Benedikt R.
      * getPlayerWithHighestCard returns a list of players whose card have the highest number.
      * @return The list of players with the highest card.
      */

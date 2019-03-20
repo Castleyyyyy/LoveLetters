@@ -1,3 +1,6 @@
+/**
+ * Benedikt R.
+ */
 public class Guard extends Card {
 
   static String NAME = "GUARD";

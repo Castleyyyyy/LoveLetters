@@ -1,3 +1,6 @@
+/**
+ * Benedikt R.
+ */
 public class Database {
 
     DatabaseConnector db;

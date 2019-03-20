@@ -1,3 +1,6 @@
+/**
+ * Benedikt R.
+ */
 public class Princess extends Card {
   
   static String NAME = "PRINCESS";

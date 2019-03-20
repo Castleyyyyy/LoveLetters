@@ -1,3 +1,7 @@
+/**
+ * Benedikt R.
+ */
+
 public class Priest extends Card {
   private int number = 2;
   private String NAME = "PRIEST";
