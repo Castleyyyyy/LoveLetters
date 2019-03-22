@@ -1,3 +1,7 @@
+/**
+   * Katja E.
+   * Great GameServer for great fun.
+   */
 import javafx.util.Pair;
 
 public class GameServer extends Server {
