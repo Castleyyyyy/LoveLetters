@@ -52,7 +52,17 @@ public class Game {
   List<Player> getProtectedPlayers() {
     return this.playerBase.getProtectedPlayers();
   }
-
+  
+  /**
+     * Katja E.
+     * Determine card, targetPlayer and guessed card from names.
+     * Throw all the exceptions in the world if anything doesn't go according to plan.
+     * Actually play the card (make it cause the effect and call back to server).
+     * @param player The player who played the card
+     * @param cardName The name of the card played
+     * @param selectedPlayer The target chosen by the player (not countess, princess and maid)
+     * @param guessedCardName The name of the card guessed (guard only)
+     **/
   void playCard(Player player, String cardName, String selectedPlayerName, String guessedCardName) throws NotInGameException, NotYourTurnException, InvalidCardNameException, IllegalCardGuessException, IllegalTargetPlayerException, MustPlayCountessException, NotYourCardException, PlayerProtectedException {
     //NotInGameException (player not part of playerBase)
     if (!this.playerBase.hasPlayer(player)) {
@@ -113,7 +123,7 @@ public class Game {
     } 
     
     //PlayerProtectedException
-    if (!(card.getName().equals("COUNTESS") || card.getName().equals("MAID"))) { // maid and countess don't have target
+    if (!(card.getName().equals("COUNTESS") || card.getName().equals("MAID")) || card.getName().equals("PRINCESS")) { // maid, princess and countess don't have target
       if (targetPlayer.isProtected()) {
         throw new PlayerProtectedException();
       }
@@ -152,8 +162,12 @@ public class Game {
     
     this.nextRound();                                                           // invoke first round
   } // end of startGame
-
-  void resetCardStack() {                                                        // put all 16 cards on cardStack (ordered)
+  
+  /**
+     * Katja E.
+     * Put all 16 cards on cardStack (ordered)
+     */
+  void resetCardStack() {                                                        
     this.cardStack = new Stack<Card>();
     
     this.cardStack.push(new Princess());
@@ -173,8 +187,15 @@ public class Game {
     this.cardStack.push(new Guard());
     this.cardStack.push(new Guard());
   } // end of resetCardStack
-
-  void shuffle() {                                                               // randomly change order of cards in cardStack
+  
+  
+  /**
+     * Katja E.
+     * Randomly change order of cards in cardStack by distributing them to a
+     * random number of stacks and putting them back onto cardStack in the
+     * new order.
+     */
+  void shuffle() {                                                              
     Random zufall = new Random();                                               // make a list of up to 15 stacks
     int stapelAnzahl = zufall.nextInt(14);
     stapelAnzahl++;
@@ -203,7 +224,15 @@ public class Game {
       } // end of while
     } // end of for
   } // end of shuffle
-
+  
+  
+  /**
+    * Katja E.
+    * Rotate playerBase to the next player who isn't protected and make them 
+    * draw a card. 
+    * End game if cardStack is empty or someone has enough hearts or continue
+    * to nextRound if only one player is left but they don't have enough hearts.
+    */
   void nextPlayer() {
     
     
@@ -235,7 +264,8 @@ public class Game {
       } // end of if-else
     } // end of if-else
   } // end of nextPlayer
-
+  
+  
   void nextRound() {
     this.resetCardStack();                                                      // reset cardStack and shuffle twice - better safe than sorry
     this.shuffle();
@@ -496,6 +526,7 @@ public class Game {
   }
 
     /**
+     * Katja E.
      * Return player using given IP and Port.
      *
      * @param pClientIP   IP of the player in question.
@@ -515,6 +546,7 @@ public class Game {
   }
 
     /**
+     * Katja E.
      * Return player using given username.
      *
      * @param pClientName Username of the player in question.
@@ -534,6 +566,7 @@ public class Game {
 
 
     /**
+     * Katja E.
      * Determine player(s) with most hearts by making a list of players with max
      * hearts and override it when player with more than max hearts is found.
      */
@@ -560,6 +593,7 @@ public class Game {
 
 
     /**
+     * Katja E.
      * Determine whether a player is part of the player base.
      *
      * @param player The player in question
@@ -569,6 +603,7 @@ public class Game {
   }
 
     /**
+     * Katja E.
      * Find card with given name and return its help.
      *
      * @param cardName Name of the card in question.
@@ -583,6 +618,7 @@ public class Game {
   }
 
     /**
+     * Katja E.
      * returns a string containing the players cards in format <card1>:<card2>
      * if there is two cards, else it's just <card1>
      *
@@ -599,6 +635,7 @@ public class Game {
   }
 
     /**
+     * Katja E.
      * Returns a String containing the current ranking (usernames and hearts) in format
      * <player1>,<player2>,<player3>,<player4>:<hearts1>,<hearts2>,<hearts3>,<hearts4>
      * using the getWinners method multiple times
@@ -634,6 +671,7 @@ public class Game {
   }
 
     /**
+     * Katja E.
      * Eliminates a player from the game, removes him from the playerBase and
      * resets his hearts and his card list.
      *
