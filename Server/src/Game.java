@@ -87,37 +87,38 @@ public class Game {
     }
     
     //IllegalCardGuessException (cardGuess doesn't exist OR player guessed guard)
-    if (guessedCardName.toUpperCase().equals("GUARD")) {
-      throw new IllegalCardGuessException();
-    }
-    
     Card guessedCard = null;
-    for (cardList.toFirst(); cardList.hasAccess(); cardList.next()) {
-      if (cardList.getContent().hasName(guessedCardName.toUpperCase())) {
-        guessedCard = cardList.getContent();
+    if (card.getName().equals("GUARD")) {                      //only guard has cardGuess
+      if (guessedCardName.toUpperCase().equals("GUARD")) {
+        throw new IllegalCardGuessException();
       }
-    } // end of for
-    if (guessedCard == null) {
-      throw new IllegalCardGuessException();
-    }
-
-    //IllegalTargetPlayerException (only when player isn't part of playerBase. Protected players can be targeted)
+      
+      for (cardList.toFirst(); cardList.hasAccess(); cardList.next()) {
+        if (cardList.getContent().hasName(guessedCardName.toUpperCase())) {
+          guessedCard = cardList.getContent();
+        }
+      } // end of for
+      if (guessedCard == null) {
+        throw new IllegalCardGuessException();
+      }
+    } 
+    
+    
+    //IllegalTargetPlayerException (only when player isn't part of playerBase)
     Player targetPlayer = this.getPlayerByUsername(selectedPlayerName);
-    if (targetPlayer == null && !selectedPlayerName.equals("")) {
-      throw new IllegalTargetPlayerException();
-    }
-
-    // When card countess or maid is played, no target player is needed.
-    if (!selectedPlayerName.equals("")) {
-      if (!(card.getName().equals("COUNTESS") || card.getName().equals("MAID"))) {
+    if (!(card.getName().equals("COUNTESS") || card.getName().equals("MAID"))) { //maid and countess don't have target
+      if (targetPlayer == null && !selectedPlayerName.equals("")) {
         throw new IllegalTargetPlayerException();
       }
-    }
-
-    if (targetPlayer.isProtected()) {
-      throw new PlayerProtectedException();
-    }
-
+    } 
+    
+    //PlayerProtectedException
+    if (!(card.getName().equals("COUNTESS") || card.getName().equals("MAID"))) { // maid and countess don't have target
+      if (targetPlayer.isProtected()) {
+        throw new PlayerProtectedException();
+      }
+    } 
+    
     //MustPlayCountessException (player tried to play king or prince but has countess on hand)
     if (card.getName().equals("KING") || card.getName().equals("PRINCE")) {
       for (player.getCards().toFirst(); player.getCards().hasAccess(); player.getCards().next()) {
@@ -154,7 +155,7 @@ public class Game {
 
   void resetCardStack() {                                                        // put all 16 cards on cardStack (ordered)
     this.cardStack = new Stack<Card>();
-
+    
     this.cardStack.push(new Princess());
     this.cardStack.push(new Countess());
     this.cardStack.push(new King());
@@ -204,9 +205,9 @@ public class Game {
   } // end of shuffle
 
   void nextPlayer() {
-
-
-
+    
+    
+    
     if (playerBase.rotate() && !this.cardStack.isEmpty()) {
       //TODO: nächster spieler muss eine karte ziehen
       return;
@@ -215,17 +216,17 @@ public class Game {
         // If the card stack is empty, the player with the highest card gets a heart.
         List<Player> p = playerBase.getPlayerWithHighestCard();
         if (p == null) return;
-
+        
         for (p.toFirst(); p.hasAccess(); p.next()) {
           p.getContent().addHeart();
         }
-
+        
         this.onRoundFinished.run();
       }else {
         this.playerBase.getCurrentPlayer().addHeart();
         this.onRoundFinished.run();
       }
-
+      
       if (this.playerBase.getCurrentPlayer().getHearts() == this.playerBase.getRequiredHearts()) {        // if game finished
         this.onGameFinished.accept(this.getWinners(playerBase.getCopyOfPlayers()));
         this.phase = GamePhase.FINISHED;                                        // anything missing here??
@@ -246,14 +247,14 @@ public class Game {
       players.dequeue();
       p.giveCard(this.drawCard());
     }
-
+    
     // If there are only two players, smaller stack.
     if (this.playerBase.getNumberOfPlayers() == 2) {
       this.drawCard();
       this.drawCard();
       this.drawCard();
     }
-
+    
     this.roundCounter.incrementAndGet();
     this.writeResultsToDB();
   } // end of nextRound
