@@ -17,15 +17,16 @@ public class Game {
   private Consumer<Player> onPlayerJoined;
   private Consumer<List<Player>> onGameFinished;
   private Runnable onGameStarted;
-  private Consumer<Card> onCardPlayed;
+  private Consumer<Pair<Card, Player>> onCardPlayed;
   private Runnable onRoundFinished;
   private Consumer<Player> onPlayerEliminated;
   private Consumer<Pair<Player, Player>> onCardsSwapped;
   private Consumer<Pair<Player, List<Card>>> onReceivesNewCards;
   private Consumer<Pair<Player, Card>> onCardRevealedToAll;
   private Consumer<CardRevealedToSinglePlayerPayload> onCardRevealedToSinglePlayer;
+  private Consumer<Player> onPlayerRotated;
 
-  public Game(Consumer<Player> onPlayerJoined, Consumer<List<Player>> onGameFinished, Runnable onGameStarted, Consumer<Card> onCardPlayed, Runnable onRoundFinished, Consumer<Player> onPlayerEliminated, Consumer<Pair<Player, Player>> onCardsSwapped, Consumer<Pair<Player, List<Card>>> onReceivesNewCards, Consumer<Pair<Player, Card>> onPlayersCardRevealed, Consumer<CardRevealedToSinglePlayerPayload> onCardRevealedToSinglePlayer) {
+  public Game(Consumer<Player> onPlayerJoined, Consumer<List<Player>> onGameFinished, Runnable onGameStarted, Consumer<Pair<Card, Player>> onCardPlayed, Runnable onRoundFinished, Consumer<Player> onPlayerEliminated, Consumer<Pair<Player, Player>> onCardsSwapped, Consumer<Pair<Player, List<Card>>> onReceivesNewCards, Consumer<Pair<Player, Card>> onPlayersCardRevealed, Consumer<CardRevealedToSinglePlayerPayload> onCardRevealedToSinglePlayer, Consumer<Player> onPlayerRotated) {
     this.onPlayerJoined = onPlayerJoined;
     this.onGameFinished = onGameFinished;
     this.onGameStarted = onGameStarted;
@@ -36,6 +37,7 @@ public class Game {
     this.onReceivesNewCards = onReceivesNewCards;
     this.onCardRevealedToAll = onPlayersCardRevealed;
     this.onCardRevealedToSinglePlayer = onCardRevealedToSinglePlayer;
+    this.onPlayerRotated = onPlayerRotated;
     
     this.db = new Database("127.0.0.1", 3306, "loveletters", "root", "");
     
@@ -141,7 +143,7 @@ public class Game {
     card.causeEffect(this, targetPlayer, guessedCard);
     
     // TODO: Es gibt einzelne Methoden für die verschiedenen Effekte. Ich weis deshalb nicht, ob cardPlayed hier notwendig ist.
-    onCardPlayed.accept(card);
+    onCardPlayed.accept(new Pair<Card, Player>(card, targetPlayer));
   }
 
   void startGame(Player player) throws GameIsPendingException, NotEnoughPlayersException, NotInGameException {
@@ -234,11 +236,9 @@ public class Game {
     * to nextRound if only one player is left but they don't have enough hearts.
     */
   void nextPlayer() {
-    
-    
-    
     if (playerBase.rotate() && !this.cardStack.isEmpty()) {
-      //TODO: nächster spieler muss eine karte ziehen
+      playerBase.getCurrentPlayer().getCards().append(this.drawCard());
+      onPlayerRotated.accept(playerBase.getCurrentPlayer());
       return;
     } else {                                           // if round finished
       if (this.cardStack.isEmpty()){
@@ -275,7 +275,11 @@ public class Game {
     while (!players.isEmpty()) {
       Player p = players.front();
       players.dequeue();
-      p.giveCard(this.drawCard());
+      
+      Card drawn = this.drawCard();
+      p.giveCard(drawn);
+      onReceivesNewCards.accept(new Pair<Player, List<Card>>(p, p.getCards()));
+      onPlayerRotated.accept(p);
     }
     
     // If there are only two players, smaller stack.

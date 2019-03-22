@@ -19,7 +19,8 @@ public class GameServer extends Server {
     this::onCardsSwapped,
     this::onReceivesNewCards,
     this::onPlayersCardRevealed,
-    this::onCardRevealedToSinglePlayer
+    this::onCardRevealedToSinglePlayer,
+    this::onPlayerRotated
     );
   }
   
@@ -37,8 +38,8 @@ public class GameServer extends Server {
     this.sendToAll(result);
   }
 
-  void onCardPlayed(Card card) {
-    System.out.println("Card was played");
+  void onCardPlayed(Pair<Card, Player> pair) {
+    sendToAll("+CARD_PLAYED:" + pair.getKey() + ":" + pair.getValue());
   }
   
   void onPlayerEliminated(Player player){
@@ -46,20 +47,44 @@ public class GameServer extends Server {
   }
   
   void onCardsSwapped(Pair<Player, Player> pair){                               
-    System.out.println("Players " + pair.getKey().getUsername() + " and " + pair.getValue().getUsername() + " have swapped cards.");
+    Player onePlayer = pair.getKey();
+    Player anotherPlayer = pair.getValue();
+    sendToAll("+CARDS_SWAPPED:" + onePlayer.getUsername() + ":" + anotherPlayer.getUsername());
   }
   
   void onReceivesNewCards(Pair<Player, List<Card>> pair){                       
-    System.out.println("Player " + pair.getKey().getUsername() + " receives new Cards.");
+    Player player = pair.getKey();
+    List<Card> cardList = pair.getValue();
+    String cards = "";
+    
+    for (cardList.toFirst(); cardList.hasAccess(); cardList.next()) {
+      cards = cards + cardList.getContent().getName() + ":";
+    } // end of for
+    cards = cards.substring(0, cards.lastIndexOf(":"));
+    
+    send(player.getIP(), player.getPort(), "+CARDS_DRAWN:" + cards);
   }
   
   void onPlayersCardRevealed(Pair<Player, Card> pair){                          
-    //TODO
+    sendToAll("+CARD_REVEALED" + pair.getKey() + ":" + pair.getValue());
   }
   
   void onCardRevealedToSinglePlayer(CardRevealedToSinglePlayerPayload payload){
-    //TODO
-  } 
+    Player from = payload.getFrom();
+    Player to = payload.getTo();
+    Card revealed = payload.getCardRevealed();
+    
+    send(from.getIP(), from.getPort(), "+CARD_SHOWN_TO_PLAYER:" + to.getUsername() + ":" + revealed.getName());
+    send(to.getIP(), to.getPort(), "+PLAYER_CARD:" + revealed.getName());
+  }
+  
+  void onPlayerRotated(Player nextPlayer){
+    sendToAll("+PLAYER_ROTATED:" + nextPlayer.getUsername());
+  }
+  
+  void onRoundFinished(){
+    //TODO: Announce winner(s) of round
+  }
   
   @Override
   void processNewConnection(String pClientIP, int pClientPort) {
@@ -183,7 +208,11 @@ public class GameServer extends Server {
         } catch (Game.MustPlayCountessException e){
           send(pClientIP, pClientPort, "-FAIL:MUST_PLAY_COUNTESS");
           break;
+        } catch (Game.PlayerProtectedException e){
+          send(pClientIP, pClientPort, "-FAIL:PLAYER_PROTECTED");
+          break;
         }
+        
         
         send(pClientIP, pClientPort, "+OK");
         break;
